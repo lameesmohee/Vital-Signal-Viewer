@@ -198,15 +198,23 @@ class File:
             # interval = 2000 milli second. The frames will be updated every 2 seconds.
             # frames = 200. After plotting 200 frames, the animation will stop.
 
-            self.ani = FuncAnimation(plt.gcf(), self.animate, init_func=self.init, interval=100, frames=len(self.time_list), repeat=False)
+            self.ani = FuncAnimation(plt.gcf(), self.animate, init_func=self.init, interval=100, frames=len(self.time_list) - 1, repeat=False)
             # plt.show()
 
             scene = QtWidgets.QGraphicsScene()
             # view = QtWidgets.QGraphicsView(scene, self.Qwindow)
 
+            # self.Qwindow.graphicsView_channel1.setScene(scene)
+            # canvas = FigureCanvasQTAgg(self.fig)
+            # scene.addWidget(canvas)
+            # toolbar_1 = NavigationToolbar(canvas, self.Qwindow)
+            # # self.Qwindow.verticalLayout_channel1.addWidget(toolbar)
+            # self.Qwindow.verticalLayout_toolbar1.addWidget(toolbar_1)
+
+
             # Removing the repeation of the toolbar
             # List of layouts to check
-            layouts = [self.Qwindow.verticalLayout_channel1, self.Qwindow.verticalLayout_channel2]
+            layouts = [self.Qwindow.verticalLayout_toolbar1, self.Qwindow.verticalLayout_toolbar2]
 
             # Iterate through the layouts
             for layout in layouts:
@@ -223,8 +231,7 @@ class File:
                 canvas = FigureCanvasQTAgg(self.fig)
                 scene.addWidget(canvas)
                 toolbar_1 = NavigationToolbar(canvas, self.Qwindow)
-                toolbar_1.setFixedSize(toolbar_1.sizeHint())
-                self.Qwindow.verticalLayout_channel1.addWidget(toolbar_1)
+                self.Qwindow.verticalLayout_toolbar1.addWidget(toolbar_1)
 
             else:
                 self.Qwindow.graphicsView_channel1.setScene(None)
@@ -236,7 +243,7 @@ class File:
                 canvas = FigureCanvasQTAgg(self.fig)
                 scene.addWidget(canvas)
                 toolbar_2 = NavigationToolbar(canvas, self.Qwindow)
-                self.Qwindow.verticalLayout_channel2.addWidget(toolbar_2)
+                self.Qwindow.verticalLayout_toolbar2.addWidget(toolbar_2)
             else:
                 self.Qwindow.graphicsView_channel2.setScene(None)
 
