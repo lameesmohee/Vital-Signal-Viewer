@@ -53,8 +53,21 @@ class File:
         self.visited=[]
         self.specific_row=0
         self.Qwindow=MainApp()
-        self.fig = plt.figure(figsize=(5, 4))
+        self.fig = plt.figure(figsize=(898 / 80, 345/ 80), dpi=80)
+        self.fig.set_facecolor('#222b2e')
         self.ax = self.fig.add_subplot(111)
+        self.ax.set_facecolor('#222b2e')
+        # self.ax.grid(False)
+        self.ax.grid(True, color='gray', linestyle='--', alpha=0.5)
+        self.ax.xaxis.label.set_color('white')  # X-axis label
+        self.ax.yaxis.label.set_color('white')
+
+        self.ax.spines['bottom'].set_color('white')
+        self.ax.spines['left'].set_color('white')
+        self.ax.xaxis.set_tick_params(color='white')
+        self.ax.yaxis.set_tick_params(color='white')
+        self.ax.xaxis.get_major_ticks()[0].label.set_color('white')  # X-axis
+        self.ax.yaxis.get_major_ticks()[0].label.set_color('white')  # Y-axis
 
         self.handle_button_push()
 
@@ -151,7 +164,6 @@ class File:
 
             print(self.visited)
             if len(self.visited) < 2:
-                # fig = plt.figure(figsize=(5, 4))
                 # ax = fig.add_subplot(111)
                 plt.xlabel('Time (s)')  # label x axis
                 plt.ylabel(self.line_applied)  # label y axis
@@ -159,11 +171,13 @@ class File:
                 # x_range = (0, 10)
                 # y_range = (0, 1)
                 # ax = plt.axes(xlim=(0,4), ylim=(0,40))
+                for tick in self.ax.get_xticklabels():
+                    tick.set_color('white')  # X-axis
 
+                for tick in self.ax.get_yticklabels():
+                    tick.set_color('white')
 
             data_x, data_y = self.time_list, self.signal_values_list
-
-
 
             # ax = plt.axes(xlim=x_range,
             #               ylim=y_range)
@@ -172,32 +186,59 @@ class File:
             y_range = (floor(min(data_y)), ceil(max(data_y)))
             # print(x_range)
 
+
             self.ax.set_xlim(x_range)
             self.ax.set_ylim(y_range)
             self.line_plot, = self.ax.plot([], [])
 
             print(self.line_plot)
 
-
-
             # plt.gcf (get current figure) will reload the plat based on the data saved in the 'data' DataFrame
             # animate argument will call the function defined above
             # interval = 2000 milli second. The frames will be updated every 2 seconds.
             # frames = 200. After plotting 200 frames, the animation will stop.
 
-            self.ani = FuncAnimation(plt.gcf(), self.animate, init_func=self.init, interval=20, frames=len(self.time_list), repeat=False)
+            self.ani = FuncAnimation(plt.gcf(), self.animate, init_func=self.init, interval=100, frames=len(self.time_list), repeat=False)
             # plt.show()
 
             scene = QtWidgets.QGraphicsScene()
             # view = QtWidgets.QGraphicsView(scene, self.Qwindow)
-            self.Qwindow.graphicsView_channel1.setScene(scene)
 
+            # Removing the repeation of the toolbar
+            # List of layouts to check
+            layouts = [self.Qwindow.verticalLayout_channel1, self.Qwindow.verticalLayout_channel2]
 
+            # Iterate through the layouts
+            for layout in layouts:
+                for i in reversed(range(layout.count())):
+                    widget = layout.itemAt(i).widget()
+                    if isinstance(widget, NavigationToolbar):
+                        layout.removeWidget(widget)
+                        widget.deleteLater()
 
-            canvas = FigureCanvasQTAgg(self.fig)
-            scene.addWidget(canvas)
-            toolbar = NavigationToolbar(canvas, self.Qwindow)
-            self.Qwindow.verticalLayout_graph.addWidget(toolbar)
+            if self.Qwindow.checkBox_2.isChecked():
+                self.Qwindow.graphicsView_channel1.setScene(scene)
+
+                # Add a new instance of the toolbar when checkbox is checked
+                canvas = FigureCanvasQTAgg(self.fig)
+                scene.addWidget(canvas)
+                toolbar_1 = NavigationToolbar(canvas, self.Qwindow)
+                toolbar_1.setFixedSize(toolbar_1.sizeHint())
+                self.Qwindow.verticalLayout_channel1.addWidget(toolbar_1)
+
+            else:
+                self.Qwindow.graphicsView_channel1.setScene(None)
+
+            if self.Qwindow.checkBox_3.isChecked():
+                self.Qwindow.graphicsView_channel2.setScene(scene)
+
+                # Add a new instance of the toolbar when checkbox is checked
+                canvas = FigureCanvasQTAgg(self.fig)
+                scene.addWidget(canvas)
+                toolbar_2 = NavigationToolbar(canvas, self.Qwindow)
+                self.Qwindow.verticalLayout_channel2.addWidget(toolbar_2)
+            else:
+                self.Qwindow.graphicsView_channel2.setScene(None)
 
             # view.resize(200, 200)
             # view.setGeometry(70,410, 1039, 216)
@@ -226,9 +267,6 @@ class File:
             self.line = file_name.split('/')[6].split('_')[0]
 
             self.Qwindow.signals_name.addItem(self.line)
-
-
-
 
     def read_ecg_data_from_csv(self, file_name):
         try:
@@ -264,13 +302,6 @@ class MainApp(QMainWindow, MainUI):
 
     def hi(self):
         print("hello")
-
-
-
-
-
-
-
 
 def main():
     app = QApplication(sys.argv)
