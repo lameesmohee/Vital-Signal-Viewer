@@ -13,7 +13,7 @@ import csv
 import pandas as pd
 import matplotlib.pyplot as plt
 from math import ceil, floor
-
+import numpy as np
 plt.style.use('ggplot')
 from matplotlib.animation import FuncAnimation
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg,NavigationToolbar2QT as NavigationToolbar
@@ -53,36 +53,47 @@ class File:
         self.visited=[]
         self.specific_row=0
         self.Qwindow=MainApp()
-        self.fig = plt.figure(figsize=(898 / 80, 345/ 80), dpi=80)
+        self.line_color = None
+        self.Qwindow.color_picker_button.clicked.connect(self.show_color_dialog)
+        self.fig = plt.figure(figsize=(899 / 80, 429/ 80), dpi=80)
         self.fig.set_facecolor('#222b2e')
         self.ax = self.fig.add_subplot(111)
         self.ax.set_facecolor('#222b2e')
-        # self.ax.grid(False)
         self.ax.grid(True, color='gray', linestyle='--', alpha=0.5)
         self.ax.xaxis.label.set_color('white')  # X-axis label
         self.ax.yaxis.label.set_color('white')
-
         self.ax.spines['bottom'].set_color('white')
         self.ax.spines['left'].set_color('white')
         self.ax.xaxis.set_tick_params(color='white')
         self.ax.yaxis.set_tick_params(color='white')
         self.ax.xaxis.get_major_ticks()[0].label.set_color('white')  # X-axis
         self.ax.yaxis.get_major_ticks()[0].label.set_color('white')  # Y-axis
-
         self.handle_button_push()
-
-
+        self.row_counter = 0
+        self.Qwindow.tableWidget.setColumnCount(6)
+        self.Qwindow.tableWidget.setEditTriggers(QTableWidget.NoEditTriggers)
+        for column in range (self.Qwindow.tableWidget.columnCount()):
+            self.Qwindow.tableWidget.setColumnWidth(column,309)
+        header = self.Qwindow.tableWidget.horizontalHeader()
+        header.setMinimumHeight(50)
+        header_style = """
+                                QHeaderView::section {
+                                    background-color: #4fa08b; /* Change this to your desired color */
+                                    color: white; /* Text color */
+                                    font-weight: bold;
+                                    font-size: 16px
+                                }
+                            """
+        self.Qwindow.tableWidget.horizontalHeader().setStyleSheet(header_style)
 
     def handle_button_push(self):
         self.Qwindow.open_file.triggered.connect(self.browse_file)
-
         self.Qwindow.pushButton_plot.clicked.connect(self.Plot)
         self.Qwindow.minus_button.clicked.connect(self.decrease_speed)
         self.Qwindow.plus_button.clicked.connect(self.increase_speed)
         self.Qwindow.checkBox_2.stateChanged.connect(self.Ischecked)
         self.Qwindow.checkBox_3.toggled.connect(self.Ischecked)
         self.Qwindow.checkBox_3.setCheckable(True)
-
 
     def Ischecked(self):
         channel1 = self.Qwindow.checkBox_2.isChecked()
@@ -92,12 +103,6 @@ class File:
         else:
             return  channel2
 
-
-
-
-
-
-
     def increase_speed(self):
         if self.delay_interval == None:
             msg = QMessageBox()
@@ -105,7 +110,6 @@ class File:
             msg.setInformativeText("Please UPload A Signal")
             msg.show()
             msg.exec_()
-
 
     def decrease_speed(self):
         if self.delay_interval == None:
@@ -168,9 +172,7 @@ class File:
                 plt.xlabel('Time (s)')  # label x axis
                 plt.ylabel(self.line_applied)  # label y axis
                 plt.title(self.line_applied + 'Graph')
-                # x_range = (0, 10)
-                # y_range = (0, 1)
-                # ax = plt.axes(xlim=(0,4), ylim=(0,40))
+
                 for tick in self.ax.get_xticklabels():
                     tick.set_color('white')  # X-axis
 
@@ -178,18 +180,16 @@ class File:
                     tick.set_color('white')
 
             data_x, data_y = self.time_list, self.signal_values_list
-
-            # ax = plt.axes(xlim=x_range,
-            #               ylim=y_range)
-
             x_range = (floor(min(data_x)), ceil(max(data_x)))
             y_range = (floor(min(data_y)), ceil(max(data_y)))
-            # print(x_range)
-
 
             self.ax.set_xlim(x_range)
             self.ax.set_ylim(y_range)
             self.line_plot, = self.ax.plot([], [])
+            if self.line_color is not None:
+                self.line_plot, = self.ax.plot([], [], color=self.line_color.name())
+            else:
+                self.line_plot, = self.ax.plot([])
 
             print(self.line_plot)
 
@@ -272,8 +272,24 @@ class File:
             self.files_name.append(file_name)
             file_name=str(file_name)
             self.line = file_name.split('/')[6].split('_')[0]
-
+            self.time_list, self.signal_values_list = self.read_ecg_data_from_csv(file_name)
             self.Qwindow.signals_name.addItem(self.line)
+            self.row_counter = self.row_counter + 1
+            self.Qwindow.tableWidget.setRowCount(self.row_counter)
+            mean = self.Qwindow.calc_mean(self.signal_values_list)
+            std = self.Qwindow.calc_std(self.signal_values_list)
+            duration = self.Qwindow.calc_duration(self.time_list)
+            min_value, max_value = self.Qwindow.calc_min_max_values(self.signal_values_list)
+            print(mean)
+            print(std)
+            print(duration)
+            self.Qwindow.tableWidget.setItem(self.row_counter - 1, 0, QTableWidgetItem(self.line))
+            self.Qwindow.tableWidget.setItem(self.row_counter - 1, 1, QTableWidgetItem(str(round(mean, 8))))
+            self.Qwindow.tableWidget.setItem(self.row_counter - 1, 2, QTableWidgetItem(str(round(std, 8))))
+            self.Qwindow.tableWidget.setItem(self.row_counter - 1, 3, QTableWidgetItem(str(duration)))
+            self.Qwindow.tableWidget.setItem(self.row_counter - 1, 4, QTableWidgetItem(str(min_value)))
+            self.Qwindow.tableWidget.setItem(self.row_counter - 1, 5, QTableWidgetItem(str(max_value)))
+
 
     def read_ecg_data_from_csv(self, file_name):
         try:
@@ -290,6 +306,15 @@ class File:
     def forward (self):
          print(self.line)
          return self.line
+
+    def show_color_dialog(self):
+        color = QColorDialog.getColor()
+        self.Qwindow.color_picker_button.setStyleSheet(f"background-color: {color.name()}; color: white;")
+        palette = QPalette()
+        palette.setColor(QPalette.ButtonText, color)
+        self.Qwindow.color_picker_button.setPalette(palette)
+        return color
+
 
 class MainApp(QMainWindow, MainUI):
     def __init__(self, parent=None):
@@ -309,6 +334,19 @@ class MainApp(QMainWindow, MainUI):
 
     def hi(self):
         print("hello")
+
+    def calc_mean(self, values):
+        return np.mean(values)
+
+    def calc_std(self, values):
+        return np.std(values)
+
+    def calc_duration(self, time):
+        return np.max(time)
+
+    def calc_min_max_values(self, values):
+        return np.min(values), np.max(values)
+
 
 def main():
     app = QApplication(sys.argv)

@@ -552,6 +552,13 @@ QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
 }
 QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
    background: none;
+}
+QTableWidget
+{
+font-color : white;
+color : white;
+background-color: black;
+gridline-color: white;
 }</string>
   </property>
   <widget class="QWidget" name="centralwidget">
@@ -718,7 +725,7 @@ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
       <x>20</x>
       <y>110</y>
       <width>901</width>
-      <height>351</height>
+      <height>431</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_channel1">
@@ -737,7 +744,7 @@ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
       <x>940</x>
       <y>110</y>
       <width>941</width>
-      <height>351</height>
+      <height>431</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_channel2">
@@ -754,7 +761,7 @@ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>470</y>
+      <y>550</y>
       <width>381</width>
       <height>41</height>
      </rect>
@@ -765,12 +772,68 @@ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
     <property name="geometry">
      <rect>
       <x>950</x>
-      <y>470</y>
+      <y>550</y>
       <width>381</width>
       <height>41</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_toolbar2"/>
+   </widget>
+   <widget class="QTableWidget" name="tableWidget">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>660</y>
+      <width>1861</width>
+      <height>271</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: #222b2e;
+QHeaderView {
+                background-color: #4fa08b; /* Change this to your desired color */
+                color: white; /* Text color */
+}
+
+                     
+QTableWidget
+{
+font-color : white;
+color : white;
+background-color: black;
+gridline-color: white;
+}</string>
+    </property>
+    <column>
+     <property name="text">
+      <string>Signal </string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Mean</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Std</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Duration</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Min. Value</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Max. Value</string>
+     </property>
+    </column>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
