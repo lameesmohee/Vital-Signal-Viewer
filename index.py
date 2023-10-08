@@ -13,6 +13,7 @@ import csv
 import pandas as pd
 import matplotlib.pyplot as plt
 from math import ceil, floor
+from collections import Counter
 
 plt.style.use('ggplot')
 from matplotlib.animation import FuncAnimation
@@ -48,15 +49,32 @@ class File:
         self.line = None
         self.files_name=[]
         self.delay_interval = None
-        self.x=[]
-        self.y=[]
-        self.visited=[]
+        self.x_fig1= {}
+        self.y_fig1= {}
+        self.x_fig2 = []
+        self.y_fig2 = []
+        # self.list_lines=[]
+        # self.list_lines_channel1 = []
+        # self.list_lines_channel2 = []
+        self.dic_channel1 = {}
+        self.dic_channel2 = {}
+        self.visited_channel1 = []
+        self.visited_channel2 = []
         self.specific_row=0
+        self.no_of_line = 0
+        self.no_of_line_2 = -1
+        self.lines1 =[None] * 100
+        self.lines2 = [None] * 100
+
         self.Qwindow=MainApp()
         self.fig = plt.figure(figsize=(898 / 80, 345/ 80), dpi=80)
         self.fig.set_facecolor('#222b2e')
         self.ax = self.fig.add_subplot(111)
         self.ax.set_facecolor('#222b2e')
+        self.fig2 = plt.figure(figsize=(898 / 80, 345 / 80), dpi=80)
+        self.fig2.set_facecolor('#222b2e')
+        self.ax2 = self.fig2.add_subplot(111)
+        self.ax2.set_facecolor('#222b2e')
         # self.ax.grid(False)
         self.ax.grid(True, color='gray', linestyle='--', alpha=0.5)
         self.ax.xaxis.label.set_color('white')  # X-axis label
@@ -64,33 +82,54 @@ class File:
 
         self.ax.spines['bottom'].set_color('white')
         self.ax.spines['left'].set_color('white')
-        self.ax.xaxis.set_tick_params(color='white')
-        self.ax.yaxis.set_tick_params(color='white')
-        self.ax.xaxis.get_major_ticks()[0].label.set_color('white')  # X-axis
-        self.ax.yaxis.get_major_ticks()[0].label.set_color('white')  # Y-axis
+        self.ax2.grid(True, color='gray', linestyle='--', alpha=0.5)
+        self.ax2.xaxis.label.set_color('white')  # X-axis label
+        self.ax2.yaxis.label.set_color('white')
 
+        self.ax2.spines['bottom'].set_color('white')
+        self.ax2.spines['left'].set_color('white')
+        # self.ax.xaxis.set_tick_params(color='white')
+        # self.ax.yaxis.set_tick_params(color='white')
+        # self.ax.xaxis.get_major_ticks()[0].label.set_color('white')  # X-axis
+        # self.ax.yaxis.get_major_ticks()[0].label.set_color('white')  # Y-axis
+        # self.l_line = []
+        # self.l_line2 = []
         self.handle_button_push()
+        self.ax.set_xlabel('Time (s)')
+
+        self.ax.set_ylabel("Vital Signal")
 
 
 
     def handle_button_push(self):
         self.Qwindow.open_file.triggered.connect(self.browse_file)
+        QCoreApplication.processEvents()
 
         self.Qwindow.pushButton_plot.clicked.connect(self.Plot)
+        QCoreApplication.processEvents()
         self.Qwindow.minus_button.clicked.connect(self.decrease_speed)
+        QCoreApplication.processEvents()
         self.Qwindow.plus_button.clicked.connect(self.increase_speed)
+        QCoreApplication.processEvents()
         self.Qwindow.checkBox_2.stateChanged.connect(self.Ischecked)
+        QCoreApplication.processEvents()
         self.Qwindow.checkBox_3.toggled.connect(self.Ischecked)
+        QCoreApplication.processEvents()
         self.Qwindow.checkBox_3.setCheckable(True)
 
 
     def Ischecked(self):
         channel1 = self.Qwindow.checkBox_2.isChecked()
         channel2 = self.Qwindow.checkBox_3.isChecked()
-        if channel1:
-            return channel1
+        if channel1 and channel2:
+            return "channel1","channel2"
+        elif channel1:
+
+            return ["channel1","None"]
+        elif channel2:
+            return  ["None", "channel2"]
         else:
-            return  channel2
+            return ["None" ,"None"]
 
 
 
@@ -115,151 +154,333 @@ class File:
             msg.show()
             msg.exec_()
 
-    def animate(self,i):
+    def animate_fig2(self, i):
         # print("kckfdlk")
         global specific_row
         self.specific_row += 1
 
         self.current_data = i
 
-        self.x.append(self.time_list[self.specific_row])
-        self.y.append(self.signal_values_list[self.specific_row])
 
-        self.line_plot .set_data(self.x, self.y)
+        for j in self.dic_channel2.items():
+            self.x_fig2.append(j[1][0][self.specific_row])
+            self.y_fig2.append(j[1][1][self.specific_row])
+            print(j[1][0][self.specific_row])
+            self.lines2[j[0]].set_data(self.x_fig2,self.y_fig2)
+            if self.current_data > 30:
+                # plt.xlim(j[1][0][self.current_data - 30], j[1][0][self.current_data])
+                self.ax2.set_xlim(j[1][0][self.current_data - 30], j[1][0][self.current_data])
+
+        # self.line_plot_1.set_data(self.x_fig1, self.y_fig1)
 
         # print(f"y:{self.y}")
         # print(self.current_data)
 
-        if self.current_data > 30:
-            plt.xlim(self.time_list[self.current_data - 30], self.time_list[self.current_data])
 
-        return self.line,
 
-    def init(self):
-        self.line_plot.set_data([], [])
-        return self.line,
+        return tuple(self.lines2)
+
+
+
+
+
+
+
+
+
+
+
+
+
+        #
+        # self.x_fig2.append(self.time_list[self.specific_row])
+        # self.y_fig2.append(self.signal_values_list[self.specific_row])
+        #
+        # self.line_plot_2.set_data(self.x_fig2, self.y_fig2)
+        #
+        # # print(f"y:{self.y}")
+        # # print(self.current_data)
+        #
+        # if self.current_data > 30:
+        #     plt.xlim(self.time_list[self.current_data - 30], self.time_list[self.current_data])
+        #
+        # return self.line_plot_2,
+
+        # for self.k in self.dic_channel2.items():
+        #     # print(self.k[1][1][self.specific_row])
+        #     self.x_fig2.append(self.k[1][0][self.specific_row])
+        #     self.y_fig2.append(self.k[1][1][self.specific_row])
+        #     self.l_line2.append(self.k[0])
+        #     self.k[0].set_data(self.x_fig2, self.y_fig2)
+        #     if self.current_data > 30:
+        #         self.ax2.set_xlim(self.k[1][0][self.current_data - 30], self.k[1][0][self.current_data])
+        #
+        #     #
+        #     # print(len(self.x_fig1))
+        #
+        #     # print(f"y:{self.y}")
+        #     # print(self.current_data)
+        #     print(self.l_line2)
+        #
+        # return self.l_line2,
+
+    def animate_fig1(self,i):
+        # print("kckfdlk")
+        # self.l_line=[]
+
+        global specific_row
+        self.specific_row += 1
+
+        self.current_data = i
+        print(f"i:{i}")
+
+        for k in self.dic_channel1.items():
+            # if i < previous_i:
+
+
+            self.x_fig1[k[0]].append(k[1][0][self.specific_row])
+            self.y_fig1[k[0]].append(k[1][1][self.specific_row])
+            print(self.x_fig1[k[0]])
+            self.lines1[k[0]].set_data(self.x_fig1[k[0]],self.y_fig1[k[0]])
+            # print(self.current_data)
+            if k[0] == 0:
+                if self.current_data > 30:
+                    self.ax.set_xlim(k[1][0][self.current_data - 30], k[1][0][self.current_data])
+
+
+
+        # previous_i=i
+        return tuple(self.lines1)
+
+        # self.x_fig1.append(self.time_list[self.specific_row])
+        # self.y_fig1.append(self.signal_values_list[self.specific_row])
+        # self.line_plot.set_data(self.x_fig1, self.y_fig1)
+        # # print(f"y:{y}")
+        #
+        # if self.current_data > 30:
+        #     plt.xlim(self.time_list[self.current_data - 30], self.time_list[self.current_data])
+        #
+        # print(self.line_plot)
+        #
+        # return self.line_plot,
+
+
+
+
+        #
+        # for k in self.dic_channel1.items():
+        #      # print(self.k[1][1][self.specific_row])
+        #      self.x_fig1.append(k[1][0][self.specific_row])
+        #      self.y_fig1.append(k[1][1][self.specific_row])
+        #
+        #
+        #      if self.current_data > 30:
+        #          self.ax.set_xlim(k[1][0][self.current_data - 30], k[1][0][self.current_data])
+
+
+
+        #
+        # print(len(self.x_fig1))
+
+
+
+        # print(f"y:{self.y}")
+        # # print(self.current_data)
+        # for ax_line in self.list_lines_channel1:
+        #     ax_line.set_data(self.x_fig1, self.y_fig1)
+        #     self.l_line.append(ax_line)
+        #
+        # # print(self.l_line)
+        #
+        # return self.l_line,
+
+    # def init(self):
+    #    self.name_line.set_data([], [])
+    #    return self.name_line,
+
 
     def Plot(self):
-        file_namee, channel = self.current_file_and_channel(), self.Ischecked()
-        print(file_namee)
-        if  len(file_namee) == 0:
-            msg=QMessageBox()
-            msg.setIcon(QMessageBox.Warning)
-            msg.setInformativeText("Please UPload A Signal")
-            msg.show()
-            msg.exec_()
-
-        else:
-            # file_namee,channel=self.cu rrent_file_and_channel(),self.Ischecked()
-            print(self.files_name)
-            for file in self.files_name:
-                file_part = file.split('/')[6].split('_')[0]
-                if  file_part == file_namee:
-                    file_namee = file
-                    self.line_applied=file_part
-                    self.visited.append(file_part)
-
-                    break
-            self.time_list, self.signal_values_list = self.read_ecg_data_from_csv(file_namee)
-
-            print(self.visited)
-            if len(self.visited) < 2:
-                # ax = fig.add_subplot(111)
-                plt.xlabel('Time (s)')  # label x axis
-                plt.ylabel(self.line_applied)  # label y axis
-                plt.title(self.line_applied + 'Graph')
-                # x_range = (0, 10)
-                # y_range = (0, 1)
-                # ax = plt.axes(xlim=(0,4), ylim=(0,40))
-                for tick in self.ax.get_xticklabels():
-                    tick.set_color('white')  # X-axis
-
-                for tick in self.ax.get_yticklabels():
-                    tick.set_color('white')
-
-            data_x, data_y = self.time_list, self.signal_values_list
-
-            # ax = plt.axes(xlim=x_range,
-            #               ylim=y_range)
-
-            x_range = (floor(min(data_x)), ceil(max(data_x)))
-            y_range = (floor(min(data_y)), ceil(max(data_y)))
-            # print(x_range)
+       check_list = self.Ischecked()
+       file_namee, channel1, channel2 = self.current_file_and_channel(), check_list[0], check_list[1]
+       print(file_namee)
+       print(channel1)
+       print(channel2)
+       if len(file_namee) == 0:
+           msg = QMessageBox()
+           msg.setIcon(QMessageBox.Warning)
+           msg.setInformativeText("Please UPload A Signal")
+           msg.show()
+           msg.exec_()
+       elif (channel1 == "None" and channel2 == "None") and (
+               len(self.visited_channel1) == 0 or len(self.visited_channel2) == 0):
+           msg = QMessageBox()
+           msg.setIcon(QMessageBox.Warning)
+           msg.setInformativeText("Please Enter A Channel")
+           msg.show()
+           msg.exec_()
 
 
-            self.ax.set_xlim(x_range)
-            self.ax.set_ylim(y_range)
-            self.line_plot, = self.ax.plot([], [])
-
-            print(self.line_plot)
-
-            # plt.gcf (get current figure) will reload the plat based on the data saved in the 'data' DataFrame
-            # animate argument will call the function defined above
-            # interval = 2000 milli second. The frames will be updated every 2 seconds.
-            # frames = 200. After plotting 200 frames, the animation will stop.
-
-            self.ani = FuncAnimation(plt.gcf(), self.animate, init_func=self.init, interval=100, frames=len(self.time_list) - 1, repeat=False)
-            # plt.show()
-
-            scene = QtWidgets.QGraphicsScene()
-            # view = QtWidgets.QGraphicsView(scene, self.Qwindow)
-
-            # self.Qwindow.graphicsView_channel1.setScene(scene)
-            # canvas = FigureCanvasQTAgg(self.fig)
-            # scene.addWidget(canvas)
-            # toolbar_1 = NavigationToolbar(canvas, self.Qwindow)
-            # # self.Qwindow.verticalLayout_channel1.addWidget(toolbar)
-            # self.Qwindow.verticalLayout_toolbar1.addWidget(toolbar_1)
 
 
-            # Removing the repeation of the toolbar
-            # List of layouts to check
-            layouts = [self.Qwindow.verticalLayout_toolbar1, self.Qwindow.verticalLayout_toolbar2]
+       else:
 
-            # Iterate through the layouts
-            for layout in layouts:
-                for i in reversed(range(layout.count())):
-                    widget = layout.itemAt(i).widget()
-                    if isinstance(widget, NavigationToolbar):
-                        layout.removeWidget(widget)
-                        widget.deleteLater()
+           print(self.files_name)
+           for file in self.files_name:
+               file_part = file.split('/')[6].split('_')[0]
+               if file_part == file_namee:
+                   file_namee = file
 
-            if self.Qwindow.checkBox_2.isChecked():
-                self.Qwindow.graphicsView_channel1.setScene(scene)
+                   # self.line_applied=file_part
+                   if channel1 == "channel1" and channel2 == "None":
+                       self.visited_channel1.append(file_part)
+                       break
 
-                # Add a new instance of the toolbar when checkbox is checked
-                canvas = FigureCanvasQTAgg(self.fig)
-                scene.addWidget(canvas)
-                toolbar_1 = NavigationToolbar(canvas, self.Qwindow)
-                self.Qwindow.verticalLayout_toolbar1.addWidget(toolbar_1)
+                   elif channel2 == "channel2" and channel1 == "None":
+                       self.visited_channel2.append(file_part)
+                       break
 
-            else:
-                self.Qwindow.graphicsView_channel1.setScene(None)
+                   else:
+                       self.visited_channel1.append(file_part)
+                       self.visited_channel2.append(file_part)
 
-            if self.Qwindow.checkBox_3.isChecked():
-                self.Qwindow.graphicsView_channel2.setScene(scene)
+           self.time_list, self.signal_values_list = self.read_ecg_data_from_csv(file_namee)
 
-                # Add a new instance of the toolbar when checkbox is checked
-                canvas = FigureCanvasQTAgg(self.fig)
-                scene.addWidget(canvas)
-                toolbar_2 = NavigationToolbar(canvas, self.Qwindow)
-                self.Qwindow.verticalLayout_toolbar2.addWidget(toolbar_2)
-            else:
-                self.Qwindow.graphicsView_channel2.setScene(None)
 
-            # view.resize(200, 200)
-            # view.setGeometry(70,410, 1039, 216)
-            # view.show()
+           for tick in self.ax.get_xticklabels():
+               tick.set_color('white')
+               # X-axis
+
+           for tick in self.ax.get_yticklabels():
+               tick.set_color('white')
+
+           data_x, data_y = self.time_list, self.signal_values_list
+
+           x_range = (floor(min(data_x)), ceil(max(data_x)))
+           y_range = (floor(min(data_y)), ceil(max(data_y)))
+           # print(x_range)
+
+           print(file_part)
+           print("dcjdkjdk")
+
+           count_files_channel1 = Counter(self.visited_channel1)
+           count_files_channel2 = Counter(self.visited_channel2)
+
+
+            ## Channel 1
+           if channel1 == "channel1":
+               # if len(self.visited_channel1) == 1 and len(self.visited_channel2) >= 1:
+               #     self.ax.clear()
+               print('hi')
+
+
+               for item in count_files_channel1.items():
+                   if item[0] == file_part:
+                       no_of_repeated = item[1]
+                       break
+
+               if no_of_repeated == 1:
+                   self.previous_line1=self.no_of_line
+
+
+
+                   self.no_of_line += 1
+                   self.ax.set_xlim(x_range)
+                   self.ax.set_ylim(y_range)
+                   self.delay_interval = 200
+                   colors={0:'b',1:'r'}
+
+                   # self.line_plot,=self.ax.plot([],[] ,label=
+                   for i in range(self.previous_line1,self.no_of_line):
+
+                       self.lines1[i],=self.ax.plot([], [], label=file_part ,color=colors[i])
+                       self.x_fig1[i] = []
+                       self.y_fig1[i] = []
+
+
+                   self.dic_channel1[self.no_of_line-1] = self.read_ecg_data_from_csv(file_namee)
+                   # print(len(self.dic_channel1))
+
+                       # self.line_plot_1, =self.ax.plot([],[] ,label=file_part)
+                   # # print(self.name_line)
+                   # list_lines_channel1.append( file_part)
+                   # # print(self.dic_channel1[self.list_lines_channel1[self.no_of_line-1]])
+                   # print(list_lines_channel1[no_of_line-1])
+                   #
+                   # self.dic_channel1[a] = [],[] ,label=file_part
+
+                   if len(self.dic_channel1) > 1:
+                       self.Add_graph=True
+
+
+
+                   if len(self.dic_channel1) == 1:
+                       self.ani = FuncAnimation(self.fig, self.animate_fig1, interval=self.delay_interval,
+                                                frames=397, repeat=False)
+
+
+                   self.ax.legend()
+
+
+                   if len(self.visited_channel1) == 1:
+                      scene1 = QtWidgets.QGraphicsScene()
+                      canvas1 = FigureCanvasQTAgg(self.fig)
+                      self.Qwindow.graphicsView_channel1.setScene(scene1)
+                      scene1.addWidget(canvas1)
+                      toolbar_1 = NavigationToolbar(canvas1, self.Qwindow)
+                      self.Qwindow.verticalLayout_toolbar1.addWidget(toolbar_1)
+
+               # print(self.line_plot)
+
+           if channel2 == "channel2":
+               # if len(self.visited_channel2) == 1 and len(self.visited_channel1) >= 1:
+               #     self.ax2.clear()
+               #
+               # print(len(self.time_list))
+
+               for item in count_files_channel2.items():
+                   if item[0] == file_part:
+                       no_of_repeated = item[1]
+
+               if no_of_repeated == 1:
+                   # self.name_line2=file_part
+                   self.no_of_line_2 += 1
+                   self.ax2.set_xlim(x_range)
+                   self.ax2.set_ylim(y_range)
+                   self.delay_interval = 200
+                   # self.line_plot_2, = self.ax2.plot([], [], label=file_part)
+                   # self.name_line2, = self.ax2.plot([], [] ,label=file_part)
+                   # self.list_lines_channel2.append(self.name_line2)
+                   for i in range(self.no_of_line_2 + 1):
+                       self.lines2[i], = self.ax2.plot([], [], label=file_part)
+
+                   self.dic_channel2[self.no_of_line_2] = self.read_ecg_data_from_csv(file_namee)
+                   # self.dic_channel2[self.list_lines_channel2[self.no_of_line_2 - 1]] = self.read_ecg_data_from_csv( file_namee)
+                   self.ani2 = FuncAnimation(self.fig2, self.animate_fig2,  interval=self.delay_interval,
+                                            frames=397, repeat=False)
+
+                   QCoreApplication.processEvents()
+                   self.ax2.legend()
+
+                   scene2 = QtWidgets.QGraphicsScene()
+                   canvas2 = FigureCanvasQTAgg(self.fig2)
+                   self.Qwindow.graphicsView_channel2.setScene(scene2)
+                   scene2.addWidget(canvas2)
+                   toolbar_2 = NavigationToolbar(canvas2, self.Qwindow)
+                   self.Qwindow.verticalLayout_toolbar2.addWidget(toolbar_2)
+
+
+
+
 
     def current_file_and_channel(self):
-        # channel1=self.Qwindow.checkBox_2.isChecked()
-        # channel2=self.Qwindow.checkBox_3.isChecked()
-        # if channel1:
+           # channel1=self.Qwindow.checkBox_2.isChecked()
+           # channel2=self.Qwindow.checkBox_3.isChecked()
+           # if channel1:
 
-        return str(self.Qwindow.signals_name.currentText())
-        # else:
-        #     return str(self.Qwindow.signals_name.Current_text()), channel2
+           return str(self.Qwindow.signals_name.currentText())
 
+    # else:
+    #     return str(self.Qwindow.signals_name.Current_text()), channel2
 
     def browse_file(self):
         options = QFileDialog.Options()
@@ -276,20 +497,22 @@ class File:
             self.Qwindow.signals_name.addItem(self.line)
 
     def read_ecg_data_from_csv(self, file_name):
-        try:
-            with open(file_name, 'r') as csv_file:
-                # csv_reader = csv.DictReader(csv_file)
-                csv_reader = pd.read_csv(csv_file)
-                time_list = csv_reader.iloc[:, 0].tolist()
-                signal_values_list = csv_reader.iloc[:, 1].tolist()
-            return time_list, signal_values_list
-        except Exception as e:
-            print("Error reading CSV file")
-            return [], []
+       try:
+           with open(file_name, 'r') as csv_file:
+               # csv_reader = csv.DictReader(csv_file)
+               csv_reader = pd.read_csv(csv_file)
+               time_list = csv_reader.iloc[:, 0].tolist()
+               signal_values_list = csv_reader.iloc[:, 1].tolist()
+           return time_list, signal_values_list
+       except Exception as e:
+           print("Error reading CSV file")
+           return [], []
+
 
     def forward (self):
-         print(self.line)
-         return self.line
+       print(self.line)
+       return self.line
+
 
 class MainApp(QMainWindow, MainUI):
     def __init__(self, parent=None):
