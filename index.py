@@ -53,9 +53,9 @@ class File:
         self.y_fig1= {}
         self.x_fig2 = []
         self.y_fig2 = []
-        # self.list_lines=[]
-        # self.list_lines_channel1 = []
-        # self.list_lines_channel2 = []
+        self.present_line1 = {}
+        self.present_line2 = {}
+
         self.dic_channel1 = {}
         self.dic_channel2 = {}
         self.visited_channel1 = []
@@ -171,12 +171,6 @@ class File:
                 # plt.xlim(j[1][0][self.current_data - 30], j[1][0][self.current_data])
                 self.ax2.set_xlim(j[1][0][self.current_data - 30], j[1][0][self.current_data])
 
-        # self.line_plot_1.set_data(self.x_fig1, self.y_fig1)
-
-        # print(f"y:{self.y}")
-        # print(self.current_data)
-
-
 
         return tuple(self.lines2)
 
@@ -192,56 +186,33 @@ class File:
 
 
 
-        #
-        # self.x_fig2.append(self.time_list[self.specific_row])
-        # self.y_fig2.append(self.signal_values_list[self.specific_row])
-        #
-        # self.line_plot_2.set_data(self.x_fig2, self.y_fig2)
-        #
-        # # print(f"y:{self.y}")
-        # # print(self.current_data)
-        #
-        # if self.current_data > 30:
-        #     plt.xlim(self.time_list[self.current_data - 30], self.time_list[self.current_data])
-        #
-        # return self.line_plot_2,
-
-        # for self.k in self.dic_channel2.items():
-        #     # print(self.k[1][1][self.specific_row])
-        #     self.x_fig2.append(self.k[1][0][self.specific_row])
-        #     self.y_fig2.append(self.k[1][1][self.specific_row])
-        #     self.l_line2.append(self.k[0])
-        #     self.k[0].set_data(self.x_fig2, self.y_fig2)
-        #     if self.current_data > 30:
-        #         self.ax2.set_xlim(self.k[1][0][self.current_data - 30], self.k[1][0][self.current_data])
-        #
-        #     #
-        #     # print(len(self.x_fig1))
-        #
-        #     # print(f"y:{self.y}")
-        #     # print(self.current_data)
-        #     print(self.l_line2)
-        #
-        # return self.l_line2,
-
     def animate_fig1(self,i):
-        # print("kckfdlk")
-        # self.l_line=[]
 
         global specific_row
         self.specific_row += 1
 
         self.current_data = i
         print(f"i:{i}")
+        print(f"s:{self.specific_row}")
 
         for k in self.dic_channel1.items():
-            # if i < previous_i:
+            if k[0] != 0:
+                print("ياللهووي")
+                print(len(self.present_line1))
+                for l in self.present_line1.items():
+                    print(f"l:{l[k[0]]}")
+                    current_idx=l[k[0]]
+                    self.x_fig1[k[0]].append(k[1][0][current_idx+3 - self.specific_row])
+                    self.y_fig1[k[0]].append(k[1][1][current_idx+3 - self.specific_row])
+                    print(f"line2:{self.x_fig1[k[0]]}")
+                    self.lines1[k[0]].set_data(self.x_fig1[k[0]], self.y_fig1[k[0]])
 
+            else:
+                self.x_fig1[k[0]].append(k[1][0][self.specific_row])
+                self.y_fig1[k[0]].append(k[1][1][self.specific_row])
+                print(self.x_fig1[k[0]])
+                self.lines1[k[0]].set_data(self.x_fig1[k[0]], self.y_fig1[k[0]])
 
-            self.x_fig1[k[0]].append(k[1][0][self.specific_row])
-            self.y_fig1[k[0]].append(k[1][1][self.specific_row])
-            print(self.x_fig1[k[0]])
-            self.lines1[k[0]].set_data(self.x_fig1[k[0]],self.y_fig1[k[0]])
             # print(self.current_data)
             if k[0] == 0:
                 if self.current_data > 30:
@@ -396,20 +367,29 @@ class File:
                        self.x_fig1[i] = []
                        self.y_fig1[i] = []
 
+                   if self.no_of_line > 1:
+                       print("halllo")
+                       self.data_xline,self.data_yline =self.read_ecg_data_from_csv(file_namee)
+                       self.present_line1[self.no_of_line-1]=self.current_data
+                       for idx in range(len(self.data_xline)) :
+                             # x=self.dic_channel1[0]
 
-                   self.dic_channel1[self.no_of_line-1] = self.read_ecg_data_from_csv(file_namee)
-                   # print(len(self.dic_channel1))
+                           print(f"x:{self.dic_channel1[0][0][self.current_data]}")
+                           if self.data_xline[idx] >= self.dic_channel1[0][0][self.current_data] :
+                               print("حد يلجقنا")
+                               print(f"idx:{idx}")
 
-                       # self.line_plot_1, =self.ax.plot([],[] ,label=file_part)
-                   # # print(self.name_line)
-                   # list_lines_channel1.append( file_part)
-                   # # print(self.dic_channel1[self.list_lines_channel1[self.no_of_line-1]])
-                   # print(list_lines_channel1[no_of_line-1])
-                   #
-                   # self.dic_channel1[a] = [],[] ,label=file_part
+                               self.data_xline = self.data_xline[idx:]
+                               self.data_yline = self.data_yline[idx:]
+                               print(f"len_x:{len(self.data_xline)}")
+                               break
 
-                   if len(self.dic_channel1) > 1:
-                       self.Add_graph=True
+                       self.dic_channel1[self.no_of_line - 1] =self.data_xline,self.data_yline
+                   else:
+                       self.dic_channel1[self.no_of_line - 1] = self.read_ecg_data_from_csv(file_namee)
+
+
+
 
 
 
