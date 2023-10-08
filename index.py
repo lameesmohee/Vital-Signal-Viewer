@@ -296,7 +296,7 @@ class File:
 
            print(self.files_name)
            for file in self.files_name:
-               file_part = file.split('/')[6].split('_')[0]
+               file_part = file.split('/')[-1].split('_')[0]
                if file_part == file_namee:
                    file_namee = file
 
@@ -485,7 +485,7 @@ class File:
             print("Selected file:", file_name)
             self.files_name.append(file_name)
             file_name=str(file_name)
-            self.line = file_name.split('/')[6].split('_')[0]
+            self.line = file_name.split('/')[-1].split('_')[0]
 
             self.Qwindow.signals_name.addItem(self.line)
 
