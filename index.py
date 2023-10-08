@@ -17,27 +17,11 @@ from collections import Counter
 
 plt.style.use('ggplot')
 from matplotlib.animation import FuncAnimation
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg,NavigationToolbar2QT as NavigationToolbar
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg, NavigationToolbar2QT as NavigationToolbar
 import pyqtgraph as pg
 
 
 MainUI, _ = loadUiType(path.join(path.dirname(__file__), 'main.ui'))
-
-
-# class MplCanvas(FigureCanvasQTAgg):
-#
-#     def __init__(self, parent=None, data_x=[], data_y=[]):
-#         fig = plt.Figure()
-#         # self.ax = fig.add_subplot(111)
-#
-#         super(MplCanvas, self).__init__(fig)
-#         # print(data_x[10)
-#         #  self.file = File()
-#         data_x, data_y  = data_x, data_y
-#
-#         self.x_range = (floor(min(data_x)), ceil(max(data_x)))
-#         self.y_range = (floor(min(data_y)), ceil(max(data_y)))
-#         self.ax = plt.axes(xlim=self.x_range, ylim=self.y_range)
 
 
 
@@ -47,12 +31,12 @@ class File:
         self.time_list = []
         self.signal_values_list = []
         self.line = None
-        self.files_name=[]
+        self.files_name = []
         self.delay_interval = None
-        self.x_fig1= {}
-        self.y_fig1= {}
-        self.x_fig2 = []
-        self.y_fig2 = []
+        self.x_fig1 = {}
+        self.y_fig1 = {}
+        self.x_fig2 = {}
+        self.y_fig2 = {}
         self.present_line1 = {}
         self.present_line2 = {}
 
@@ -60,13 +44,14 @@ class File:
         self.dic_channel2 = {}
         self.visited_channel1 = []
         self.visited_channel2 = []
-        self.specific_row=0
+        self.specific_row = 0
+        self.specific_row_2 = 0
         self.no_of_line = 0
-        self.no_of_line_2 = -1
+        self.no_of_line_2 = 0
         self.lines1 =[None] * 100
         self.lines2 = [None] * 100
 
-        self.Qwindow=MainApp()
+        self.Qwindow = MainApp()
         self.fig = plt.figure(figsize=(898 / 80, 345/ 80), dpi=80)
         self.fig.set_facecolor('#222b2e')
         self.ax = self.fig.add_subplot(111)
@@ -156,20 +141,34 @@ class File:
 
     def animate_fig2(self, i):
         # print("kckfdlk")
-        global specific_row
-        self.specific_row += 1
+        global specific_row_2
+        self.specific_row_2 += 1
 
-        self.current_data = i
+        self.current_data_2 = i
 
 
-        for j in self.dic_channel2.items():
-            self.x_fig2.append(j[1][0][self.specific_row])
-            self.y_fig2.append(j[1][1][self.specific_row])
-            print(j[1][0][self.specific_row])
-            self.lines2[j[0]].set_data(self.x_fig2,self.y_fig2)
-            if self.current_data > 30:
-                # plt.xlim(j[1][0][self.current_data - 30], j[1][0][self.current_data])
-                self.ax2.set_xlim(j[1][0][self.current_data - 30], j[1][0][self.current_data])
+        for kk in self.dic_channel2.items():
+            if kk[0] != 0:
+                print("ياللهووي")
+                print(len(self.present_line2))
+                for ll in self.present_line2.items():
+                    print(f"l:{ll[kk[0]]}")
+                    current_idx_2=ll[kk[0]]
+                    self.x_fig2[kk[0]].append(kk[1][0][current_idx_2+3 - self.specific_row_2])
+                    self.y_fig2[kk[0]].append(kk[1][1][current_idx_2+3 - self.specific_row_2])
+                    print(f"line2:{self.x_fig2[kk[0]]}")
+                    self.lines2[kk[0]].set_data(self.x_fig2[kk[0]], self.y_fig2[kk[0]])
+
+            else:
+                self.x_fig2[kk[0]].append(kk[1][0][self.specific_row_2])
+                self.y_fig2[kk[0]].append(kk[1][1][self.specific_row_2])
+                print(self.x_fig2[kk[0]])
+                self.lines2[kk[0]].set_data(self.x_fig2[kk[0]], self.y_fig2[kk[0]])
+
+            # print(self.current_data)
+            if kk[0] == 0:
+                if self.current_data_2 > 30:
+                    self.ax2.set_xlim(kk[1][0][self.current_data_2 - 30], kk[1][0][self.current_data_2])
 
 
         return tuple(self.lines2)
@@ -339,8 +338,7 @@ class File:
 
             ## Channel 1
            if channel1 == "channel1":
-               # if len(self.visited_channel1) == 1 and len(self.visited_channel2) >= 1:
-               #     self.ax.clear()
+
                print('hi')
 
 
@@ -409,48 +407,63 @@ class File:
                       toolbar_1 = NavigationToolbar(canvas1, self.Qwindow)
                       self.Qwindow.verticalLayout_toolbar1.addWidget(toolbar_1)
 
-               # print(self.line_plot)
+
 
            if channel2 == "channel2":
-               # if len(self.visited_channel2) == 1 and len(self.visited_channel1) >= 1:
-               #     self.ax2.clear()
-               #
-               # print(len(self.time_list))
+
 
                for item in count_files_channel2.items():
                    if item[0] == file_part:
                        no_of_repeated = item[1]
 
                if no_of_repeated == 1:
+                   self.previous_line2 = self.no_of_line_2
                    # self.name_line2=file_part
                    self.no_of_line_2 += 1
                    self.ax2.set_xlim(x_range)
                    self.ax2.set_ylim(y_range)
                    self.delay_interval = 200
-                   # self.line_plot_2, = self.ax2.plot([], [], label=file_part)
-                   # self.name_line2, = self.ax2.plot([], [] ,label=file_part)
-                   # self.list_lines_channel2.append(self.name_line2)
-                   for i in range(self.no_of_line_2 + 1):
-                       self.lines2[i], = self.ax2.plot([], [], label=file_part)
+                   colors = {0: 'b', 1: 'r'}
 
-                   self.dic_channel2[self.no_of_line_2] = self.read_ecg_data_from_csv(file_namee)
-                   # self.dic_channel2[self.list_lines_channel2[self.no_of_line_2 - 1]] = self.read_ecg_data_from_csv( file_namee)
-                   self.ani2 = FuncAnimation(self.fig2, self.animate_fig2,  interval=self.delay_interval,
-                                            frames=397, repeat=False)
+                   for i in range(self.previous_line2,self.no_of_line_2 ):
+                       self.lines2[i], = self.ax2.plot([], [], label=file_part ,color=colors[i])
+                       self.x_fig2[i] = []
+                       self.y_fig2[i] = []
 
-                   QCoreApplication.processEvents()
-                   self.ax2.legend()
+                   if self.no_of_line_2 > 1:
+                       print("halllo2")
+                       self.data_xline_2, self.data_yline_2 = self.read_ecg_data_from_csv(file_namee)
+                       self.present_line2[self.no_of_line_2 - 1] = self.current_data_2
+                       for idx_2 in range(len(self.data_xline_2)):
+                           # x=self.dic_channel1[0]
 
-                   scene2 = QtWidgets.QGraphicsScene()
-                   canvas2 = FigureCanvasQTAgg(self.fig2)
-                   self.Qwindow.graphicsView_channel2.setScene(scene2)
-                   scene2.addWidget(canvas2)
-                   toolbar_2 = NavigationToolbar(canvas2, self.Qwindow)
-                   self.Qwindow.verticalLayout_toolbar2.addWidget(toolbar_2)
+                           print(f"x:{self.dic_channel2[0][0][self.current_data_2]}")
+                           if self.data_xline_2[idx_2] >= self.dic_channel2[0][0][self.current_data_2]:
+                               print("حد يلجقنا2")
+                               print(f"idx2:{idx_2}")
 
+                               self.data_xline_2 = self.data_xline_2[idx_2:]
+                               self.data_yline_2 = self.data_yline_2[idx_2:]
+                               print(f"len_x2:{len(self.data_xline_2)}")
+                               break
 
+                       self.dic_channel2[self.no_of_line_2 - 1] = self.data_xline_2, self.data_yline_2
+                   else:
+                       self.dic_channel2[self.no_of_line_2 - 1] = self.read_ecg_data_from_csv(file_namee)
 
+                   if len(self.dic_channel2) == 1:
+                       self.ani2 = FuncAnimation(self.fig2, self.animate_fig2, interval=self.delay_interval,
+                                                 frames=397, repeat=False)
 
+                       QCoreApplication.processEvents()
+                       self.ax2.legend()
+
+                       scene2 = QtWidgets.QGraphicsScene()
+                       canvas2 = FigureCanvasQTAgg(self.fig2)
+                       self.Qwindow.graphicsView_channel2.setScene(scene2)
+                       scene2.addWidget(canvas2)
+                       toolbar_2 = NavigationToolbar(canvas2, self.Qwindow)
+                       self.Qwindow.verticalLayout_toolbar2.addWidget(toolbar_2)
 
     def current_file_and_channel(self):
            # channel1=self.Qwindow.checkBox_2.isChecked()
