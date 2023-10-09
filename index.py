@@ -49,6 +49,7 @@ class File:
         self.row_counter = 0
         self.Qwindow.tableWidget.setColumnCount(6)
         self.Qwindow.tableWidget.setEditTriggers(QTableWidget.NoEditTriggers)
+        self.signal_color = 'r'
 
 
 
@@ -66,6 +67,7 @@ class File:
         self.Qwindow.checkBox_3.toggled.connect(self.Ischecked)
         QCoreApplication.processEvents()
         self.Qwindow.checkBox_3.setCheckable(True)
+        self.Qwindow.color_picker_button.clicked.connect(self.show_color_dialog)
         self.Qwindow.pause_button.clicked.connect(lambda: self.toggle_channel_animation(self.ani))
         self.Qwindow.pause_button_2.clicked.connect(lambda: self.toggle_channel_animation(self.ani2))
 
@@ -217,7 +219,7 @@ class File:
 
         return tuple(self.lines2)
 
-    def animate_fig1(self,i):
+    def animate_fig1(self, i):
 
         global specific_row
         self.specific_row += 1
@@ -307,10 +309,10 @@ class File:
                    self.ax.set_xlim(x_range)
                    self.ax.set_ylim(y_range)
                    self.delay_interval = 200
-                   colors = {0: 'b', 1: 'r'}
+                   # colors = {0: 'b', 1: 'r'}
                    for i in range(self.previous_line1, self.no_of_line):
 
-                       self.lines1[i], = self.ax.plot([], [], label=file_part, color=colors[i])
+                       self.lines1[i], = self.ax.plot([], [], label=file_part, color=self.signal_color)
                        self.x_fig1[i] = []
                        self.y_fig1[i] = []
 
@@ -362,10 +364,10 @@ class File:
                    self.ax2.set_xlim(x_range)
                    self.ax2.set_ylim(y_range)
                    self.delay_interval = 200
-                   colors = {0: 'b', 1: 'r'}
+                   # colors = {0: 'b', 1: 'r'}
 
                    for i in range(self.previous_line2, self.no_of_line_2):
-                       self.lines2[i], = self.ax2.plot([], [], label=file_part, color=colors[i])
+                       self.lines2[i], = self.ax2.plot([], [], label=file_part, color=self.signal_color)
                        self.x_fig2[i] = []
                        self.y_fig2[i] = []
 
@@ -404,6 +406,17 @@ class File:
     def current_file_and_channel(self):
 
            return str(self.Qwindow.signals_name.currentText())
+
+    def show_color_dialog(self):
+        color = QColorDialog.getColor()
+        self.Qwindow.color_picker_button.setStyleSheet(f"background-color: {color.name()}; color: white;")
+        palette = QPalette()
+        palette.setColor(QPalette.ButtonText, color)
+        self.Qwindow.color_picker_button.setPalette(palette)
+        self.signal_color = color.name()
+        print(self.signal_color)
+
+        return color
 
     def browse_file(self):
         options = QFileDialog.Options()
