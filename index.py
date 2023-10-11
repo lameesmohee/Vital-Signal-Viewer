@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.uic import loadUiType
+from PyQt5.QtGui import QPixmap
 from os import path
 import sys
 import csv
@@ -16,7 +17,10 @@ plt.style.use('ggplot')
 from matplotlib.animation import FuncAnimation
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg, NavigationToolbar2QT as NavigationToolbar
 import numpy as np
+from qtawesome import icon
+from DocumentWindow import Ui_documet_window
 MainUI, _ = loadUiType(path.join(path.dirname(__file__), 'main.ui'))
+DocumentWindowUI, _ = loadUiType(path.join(path.dirname(__file__), 'DocumentWindow.ui'))
 class File:
     def __init__(self):
         self.ani_list=[]
@@ -44,12 +48,16 @@ class File:
         self.lines1 =[None] * 100
         self.lines2 = [None] * 100
         self.Qwindow = MainApp()
+        self.Dwindow = DocumentWindow()
         self.handle_button_push()
         self.styles()
         self.row_counter = 0
         self.Qwindow.tableWidget.setColumnCount(6)
         self.Qwindow.tableWidget.setEditTriggers(QTableWidget.NoEditTriggers)
         self.signal_color = 'r'
+        self.toolbar_1 = None
+        self.toolbar_2 = None
+
 
 
 
@@ -70,6 +78,12 @@ class File:
         self.Qwindow.color_picker_button.clicked.connect(self.show_color_dialog)
         self.Qwindow.pause_button.clicked.connect(lambda: self.toggle_channel_animation(self.ani))
         self.Qwindow.pause_button_2.clicked.connect(lambda: self.toggle_channel_animation(self.ani2))
+        self.Qwindow.make_pdf.triggered.connect(self.open_window)
+        self.Dwindow.add_image_button.clicked.connect(self.load_image)
+
+
+    def print_pdf(self):
+        print("PDF Created")
 
 
     def styles(self):
@@ -108,6 +122,8 @@ class File:
         self.Qwindow.tableWidget.horizontalHeader().setStyleSheet(header_style)
         self.Qwindow.pause_button.hide()
         self.Qwindow.pause_button_2.hide()
+        self.Qwindow.rewind_button1.hide()
+        self.Qwindow.rewind_button2.hide()
         self.Qwindow.pause_button.setStyleSheet("background-color: white;"
                                                 " color: black;"
                                                 "font-size: 16px")
@@ -115,26 +131,12 @@ class File:
                                                   " color: black;"
                                                   "font-size: 16px")
         self.Qwindow.setFixedSize(1930,1000)
+        rewind_icon = icon("fa.backward", color='black')  # You can choose a different color
+        self.Qwindow.rewind_button1.setIcon(rewind_icon)
+        self.Qwindow.rewind_button2.setIcon(rewind_icon)
+        self.Qwindow.rewind_button1.setStyleSheet("background-color: white;")
+        self.Qwindow.rewind_button2.setStyleSheet("background-color: white;")
 
-
-    # def toggle_animation(self):
-    #     if not self.ani_list:
-    #         msg = QMessageBox()
-    #         msg.setIcon(QMessageBox.Warning)
-    #         msg.setInformativeText("No animations to toggle.")
-    #         msg.show()
-    #         msg.exec_()
-    #         return
-    #
-    #
-    #     if self.Qwindow.pause_button.text() == "►":
-    #         self.Qwindow.pause_button.setText("❚❚")
-    #         for ani in self.ani_list:
-    #             ani.event_source.start()
-    #     else:
-    #         self.Qwindow.pause_button.setText("►")
-    #         for ani in self.ani_list:
-    #             ani.event_source.stop()
 
     def toggle_channel_animation(self, ani_num):
         if ani_num == None:
@@ -346,6 +348,7 @@ class File:
                       scene1.addWidget(canvas1)
                       toolbar_1 = NavigationToolbar(canvas1, self.Qwindow)
                       self.Qwindow.pause_button.show()
+                      self.Qwindow.rewind_button1.show()
                       self.Qwindow.verticalLayout_toolbar1.addWidget(toolbar_1)
 
 
@@ -359,12 +362,10 @@ class File:
 
                if no_of_repeated == 1:
                    self.previous_line2 = self.no_of_line_2
-                   # self.name_line2=file_part
                    self.no_of_line_2 += 1
                    self.ax2.set_xlim(x_range)
                    self.ax2.set_ylim(y_range)
                    self.delay_interval = 200
-                   # colors = {0: 'b', 1: 'r'}
 
                    for i in range(self.previous_line2, self.no_of_line_2):
                        self.lines2[i], = self.ax2.plot([], [], label=file_part, color=self.signal_color)
@@ -375,7 +376,6 @@ class File:
                        self.data_xline_2, self.data_yline_2 = self.read_ecg_data_from_csv(file_namee)
                        self.present_line2[self.no_of_line_2 - 1] = self.current_data_2
                        for idx_2 in range(len(self.data_xline_2)):
-                           # x=self.dic_channel1[0]
 
                            if self.data_xline_2[idx_2] >= self.dic_channel2[0][0][self.current_data_2]:
 
@@ -401,6 +401,7 @@ class File:
                        scene2.addWidget(canvas2)
                        toolbar_2 = NavigationToolbar(canvas2, self.Qwindow)
                        self.Qwindow.pause_button_2.show()
+                       self.Qwindow.rewind_button2.show()
                        self.Qwindow.verticalLayout_toolbar2.addWidget(toolbar_2)
 
     def current_file_and_channel(self):
@@ -446,6 +447,8 @@ class File:
             self.Qwindow.tableWidget.setItem(self.row_counter - 1, 4, QTableWidgetItem(str(min_value)))
             self.Qwindow.tableWidget.setItem(self.row_counter - 1, 5, QTableWidgetItem(str(max_value)))
 
+
+
     def read_ecg_data_from_csv(self, file_name):
        try:
            with open(file_name, 'r') as csv_file:
@@ -457,12 +460,32 @@ class File:
        except Exception as e:
            print("Error reading CSV file")
            return [], []
+       
+    def open_window(self):
+        self.Dwindow.show()
+
+    def load_image(self):
+        options = QFileDialog.Options()
+        screenshots, _ = QFileDialog.getOpenFileName(self.Dwindow, "Open Image File", "",
+                                                     "Image Files (*.png *.jpg *.jpeg *.gif *.bmp)",
+                                                     options=options)
+        if screenshots:
+            pixmap = QPixmap(screenshots)
+            if not pixmap.isNull():
+                target_width = self.Dwindow.screenshot_section.width()
+                target_height = self.Dwindow.screenshot_section.height()
+                scaled_pixmap = pixmap.scaled(target_width, target_height)
+
+                self.Dwindow.screenshot_section.setPixmap(scaled_pixmap)
+                # self.Dwindow.screenshot_section.setp(pixmap)
+        else:
+            print("File dialog canceled or encountered an error.")
+
 
 
     def forward (self):
        return self.line
-    
-   
+
 
 class MainApp(QMainWindow, MainUI):
     def __init__(self, parent=None):
@@ -486,11 +509,17 @@ class MainApp(QMainWindow, MainUI):
     def calc_min_max_values(self, values):
         return np.min(values), np.max(values)
 
+class DocumentWindow(QMainWindow, DocumentWindowUI):
+    def __init__(self, parent=None):
+        super(DocumentWindow, self).__init__(parent)
+        QMainWindow.__init__(self)
+        self.setupUi(self)
+        self.setWindowTitle("Create A PDF")
+
 def main():
     app = QApplication(sys.argv)
     window = File()
     window.Qwindow.show()
-    # window.show()
     app.exec_()
 
 
