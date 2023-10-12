@@ -14,7 +14,7 @@
    <string>MainWindow</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-color:#FFFBF5</string>
+   <string notr="true">background-color:#F0F5F9</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QLabel" name="screenshot_section">
@@ -25,6 +25,10 @@
       <width>801</width>
       <height>331</height>
      </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">border: 1px solid #52616B;;
+background-color: White;</string>
     </property>
     <property name="text">
      <string/>
@@ -39,6 +43,15 @@
       <height>131</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">Background-color:White;
+border: 1px solid #52616B</string>
+    </property>
     <property name="text">
      <string/>
     </property>
@@ -48,17 +61,34 @@
      <rect>
       <x>370</x>
       <y>550</y>
-      <width>101</width>
+      <width>111</width>
       <height>31</height>
      </rect>
     </property>
     <property name="font">
      <font>
-      <pointsize>10</pointsize>
+      <pointsize>-1</pointsize>
      </font>
     </property>
     <property name="styleSheet">
-     <string notr="true">background-color:gray;</string>
+     <string notr="true">/*background-color:#C9D6DF;*/
+QPushButton {
+    background-color: #849dad; /* Background color*/
+    border: 2px solid #849dad; /* Border style*/
+    border-radius: 5px; /* Rounded corners */
+    color: #ffffff; /* Text color */
+    padding: 5px 15px; /* Padding around the text */
+    font-size: 14px; /* Text font size */
+}
+QPushButton:hover {
+    background-color: #708694; /* Background color on hover */
+    border: 2px solid #708694; /* Border style on hover */
+}
+QPushButton:pressed {
+    background-color: #52616B; /* Background color when pressed */
+    border: 2px solid #52616B; /* Border style when pressed */
+}
+</string>
     </property>
     <property name="text">
      <string>Save as PDF</string>
@@ -67,11 +97,30 @@
    <widget class="QPushButton" name="add_image_button">
     <property name="geometry">
      <rect>
-      <x>750</x>
+      <x>744</x>
       <y>360</y>
-      <width>75</width>
-      <height>24</height>
+      <width>81</width>
+      <height>31</height>
      </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">/*background-color:#C9D6DF;*/
+QPushButton {
+    background-color: #849dad; /* Background color*/
+    border: 2px solid #849dad; /* Border style*/
+    border-radius: 5px; /* Rounded corners */
+    color: #ffffff; /* Text color */
+    padding: 5px 15px; /* Padding around the text */
+    font-size: 14px; /* Text font size */
+}
+QPushButton:hover {
+    background-color: #708694; /* Background color on hover */
+    border: 2px solid #708694; /* Border style on hover */
+}
+QPushButton:pressed {
+    background-color: #52616B; /* Background color when pressed */
+    border: 2px solid #52616B; /* Border style when pressed */
+}</string>
     </property>
     <property name="text">
      <string>Browse</string>
