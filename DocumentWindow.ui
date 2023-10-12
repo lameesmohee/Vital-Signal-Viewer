@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>849</width>
-    <height>642</height>
+    <height>716</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -38,8 +38,8 @@ background-color: White;</string>
     <property name="geometry">
      <rect>
       <x>160</x>
-      <y>400</y>
-      <width>521</width>
+      <y>460</y>
+      <width>531</width>
       <height>131</height>
      </rect>
     </property>
@@ -59,15 +59,16 @@ border: 1px solid #52616B</string>
    <widget class="QPushButton" name="save_button">
     <property name="geometry">
      <rect>
-      <x>370</x>
-      <y>550</y>
-      <width>111</width>
+      <x>360</x>
+      <y>630</y>
+      <width>131</width>
       <height>31</height>
      </rect>
     </property>
     <property name="font">
      <font>
       <pointsize>-1</pointsize>
+      <bold>true</bold>
      </font>
     </property>
     <property name="styleSheet">
@@ -97,11 +98,17 @@ QPushButton:pressed {
    <widget class="QPushButton" name="add_image_button">
     <property name="geometry">
      <rect>
-      <x>744</x>
-      <y>360</y>
-      <width>81</width>
+      <x>670</x>
+      <y>350</y>
+      <width>151</width>
       <height>31</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>-1</pointsize>
+      <bold>true</bold>
+     </font>
     </property>
     <property name="styleSheet">
      <string notr="true">/*background-color:#C9D6DF;*/
@@ -123,7 +130,54 @@ QPushButton:pressed {
 }</string>
     </property>
     <property name="text">
-     <string>Browse</string>
+     <string>Add an Image</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton">
+    <property name="geometry">
+     <rect>
+      <x>670</x>
+      <y>640</y>
+      <width>171</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>11</pointsize>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color:rgb(51, 153, 0);</string>
+    </property>
+    <property name="text">
+     <string>Add a New Page ➔</string>
+    </property>
+    <property name="flat">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>310</x>
+      <y>410</y>
+      <width>201</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color:#849dad</string>
+    </property>
+    <property name="text">
+     <string>Add Your Comment Here</string>
     </property>
    </widget>
   </widget>

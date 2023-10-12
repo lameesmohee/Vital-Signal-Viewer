@@ -73,6 +73,7 @@ class File:
         self.toolbar_1 = None
         self.toolbar_2 = None
         self.pdf_counter = 0
+        self.margin = 0
 
 
 
@@ -101,58 +102,75 @@ class File:
 
 
     def styles(self):
-        self.fig = plt.figure(figsize=(898 / 80, 345 / 80), dpi=80)
-        self.fig.set_facecolor('#222b2e')
+        self.fig = plt.figure(figsize=(980 / 80, 400 / 80), dpi=80)
+        self.fig.set_facecolor('#F0F5F9')
         self.ax = self.fig.add_subplot(111)
-        self.ax.set_facecolor('#222b2e')
-        self.fig2 = plt.figure(figsize=(898 / 80, 345 / 80), dpi=80)
-        self.fig2.set_facecolor('#222b2e')
+        self.ax.set_facecolor('#F0F5F9')
+        left_margin = 0.075  # Adjust this value as needed
+        self.ax.set_position([left_margin, 0.1, 0.8, 0.89])
+        self.fig2 = plt.figure(figsize=(980 / 80, 400 / 80), dpi=80)
+        self.fig2.set_facecolor('#F0F5F9')
         self.ax2 = self.fig2.add_subplot(111)
-        self.ax2.set_facecolor('#222b2e')
+        self.ax2.set_facecolor('#F0F5F9')
+        left_margin = 0.075  # Adjust this value as needed
+        self.ax2.set_position([left_margin, 0.1, 0.8, 0.89])
         self.ax.grid(True, color='gray', linestyle='--', alpha=0.5)
-        self.ax.xaxis.label.set_color('white')  # X-axis label
-        self.ax.yaxis.label.set_color('white')
-        self.ax.spines['bottom'].set_color('white')
-        self.ax.spines['left'].set_color('white')
+        self.ax.xaxis.label.set_color('#708694')  # X-axis label
+        self.ax.xaxis.label.set_weight('bold')
+        self.ax.yaxis.label.set_color('#708694')
+        self.ax.yaxis.label.set_weight('bold')
+        self.ax.spines['bottom'].set_color('#708694')
+        self.ax.spines['left'].set_color('#708694')
         self.ax2.grid(True, color='gray', linestyle='--', alpha=0.5)
-        self.ax2.xaxis.label.set_color('white')  # X-axis label
-        self.ax2.yaxis.label.set_color('white')
-        self.ax2.spines['bottom'].set_color('white')
-        self.ax2.spines['left'].set_color('white')
+        self.ax2.xaxis.label.set_color('#708694')  # X-axis label
+        self.ax2.xaxis.label.set_weight('bold')
+        self.ax2.yaxis.label.set_color('#708694')
+        self.ax2.yaxis.label.set_weight('bold')
+        self.ax2.spines['bottom'].set_color('#708694')
+        self.ax2.spines['left'].set_color('#708694')
         self.ax.set_xlabel('Time (s)')
         self.ax.set_ylabel("Vital Signal")
+        self.ax2.set_xlabel('Time (s)')
+        self.ax2.set_ylabel("Vital Signal")
         for column in range(self.Qwindow.tableWidget.columnCount()):
-            self.Qwindow.tableWidget.setColumnWidth(column, 309)
+            self.Qwindow.tableWidget.setColumnWidth(column, 307)
         header = self.Qwindow.tableWidget.horizontalHeader()
-        header.setMinimumHeight(50)
+        header.setMinimumHeight(40)
         header_style = """
                                 QHeaderView::section {
-                                    background-color: #4fa08b; /* Change this to your desired color */
+                                    background-color: #849dad; /* Change this to your desired color */
                                     color: white; /* Text color */
                                     font-weight: bold;
                                     font-size: 16px
                                 }
                             """
+        self.Qwindow.tableWidget.setStyleSheet("QTableWidget { font-size: 15px; font-weight: bold}"
+                                               "QTableWidget::item { text-align: center; }"
+                                               "QTableWidget QHeaderView::section { text-align: center; }")
+        self.Qwindow.tableWidget.horizontalHeader().setDefaultAlignment(QtCore.Qt.AlignHCenter)
+        self.Qwindow.tableWidget.verticalHeader().setDefaultAlignment(QtCore.Qt.AlignVCenter)
         self.Qwindow.tableWidget.horizontalHeader().setStyleSheet(header_style)
+        self.Qwindow.tableWidget.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.Qwindow.pause_button.hide()
         self.Qwindow.pause_button_2.hide()
         self.Qwindow.rewind_button1.hide()
         self.Qwindow.rewind_button2.hide()
-        self.Qwindow.pause_button.setStyleSheet("background-color: white;"
-                                                " color: black;"
+        self.Qwindow.pause_button.setStyleSheet("background-color: #849dad;"
+                                                " color: white;"
                                                 "font-size: 16px")
-        self.Qwindow.pause_button_2.setStyleSheet("background-color: white;"
-                                                  " color: black;"
+        self.Qwindow.pause_button_2.setStyleSheet("background-color: #849dad;"
+                                                  " color: white;"
                                                   "font-size: 16px")
         self.Qwindow.setFixedSize(1930,1000)
-        rewind_icon = icon("fa.backward", color='black')  # You can choose a different color
+        rewind_icon = icon("fa.backward", color='white')
         self.Qwindow.rewind_button1.setIcon(rewind_icon)
         self.Qwindow.rewind_button2.setIcon(rewind_icon)
-        self.Qwindow.rewind_button1.setStyleSheet("background-color: white;")
-        self.Qwindow.rewind_button2.setStyleSheet("background-color: white;")
-
-
-
+        self.Qwindow.rewind_button1.setStyleSheet("background-color: #849dad;")
+        self.Qwindow.rewind_button2.setStyleSheet("background-color: #849dad;")
+        self.Qwindow.graphicsView_channel1.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.Qwindow.graphicsView_channel1.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.Qwindow.graphicsView_channel2.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.Qwindow.graphicsView_channel2.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
     def toggle_channel_animation(self, ani_num):
         if ani_num == None:
@@ -304,10 +322,20 @@ class File:
 
 
            for tick in self.ax.get_xticklabels():
-               tick.set_color('white')
+               tick.set_color('#708694')
+               tick.set_weight('bold')
                # X-axis
            for tick in self.ax.get_yticklabels():
-               tick.set_color('white')
+               tick.set_color('#708694')
+               tick.set_weight('bold')
+
+           for tick in self.ax2.get_xticklabels():
+               tick.set_color('#708694')
+               tick.set_weight('bold')
+               # X-axis
+           for tick in self.ax2.get_yticklabels():
+               tick.set_color('#708694')
+               tick.set_weight('bold')
            data_x, data_y = self.time_list, self.signal_values_list
            x_range = (floor(min(data_x)), ceil(max(data_x)))
            y_range = (floor(min(data_y)), ceil(max(data_y)))
@@ -362,10 +390,18 @@ class File:
                       canvas1 = FigureCanvasQTAgg(self.fig)
                       self.Qwindow.graphicsView_channel1.setScene(scene1)
                       scene1.addWidget(canvas1)
-                      toolbar_1 = NavigationToolbar(canvas1, self.Qwindow)
+                      self.toolbar_1 = NavigationToolbar(canvas1, self.Qwindow)
+                      for child in self.toolbar_1.findChildren(QtWidgets.QToolButton):
+                          child.setStyleSheet("background-color: #849dad; ")
+                      unwanted_buttons = ['Customize', 'Home']
+                      for x in self.toolbar_1.actions():
+                          if x.text() in unwanted_buttons:
+                              self.toolbar_1.removeAction(x)
                       self.Qwindow.pause_button.show()
                       self.Qwindow.rewind_button1.show()
-                      self.Qwindow.verticalLayout_toolbar1.addWidget(toolbar_1)
+                      self.Qwindow.verticalLayout_toolbar1.addWidget(self.toolbar_1)
+
+
 
 
 
@@ -416,9 +452,17 @@ class File:
                        self.Qwindow.graphicsView_channel2.setScene(scene2)
                        scene2.addWidget(canvas2)
                        toolbar_2 = NavigationToolbar(canvas2, self.Qwindow)
+                       for child in toolbar_2.findChildren(QtWidgets.QToolButton):
+                           child.setStyleSheet("background-color: #849dad; ")
+                       unwanted_buttons = ['Customize', 'Home']
+                       for x in toolbar_2.actions():
+                           if x.text() in unwanted_buttons:
+                               toolbar_2.removeAction(x)
                        self.Qwindow.pause_button_2.show()
                        self.Qwindow.rewind_button2.show()
                        self.Qwindow.verticalLayout_toolbar2.addWidget(toolbar_2)
+
+
 
     def current_file_and_channel(self):
 
