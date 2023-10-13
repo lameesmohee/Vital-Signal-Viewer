@@ -1,10 +1,10 @@
 import matplotlib
-from bokeh.models import MultiLine
+# from bokeh.models import MultiLine
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.utils import ImageReader
 from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Image
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Image, PageBreak
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import inch
 from PIL import Image as PILImage
@@ -74,6 +74,10 @@ class File:
         self.toolbar_2 = None
         self.pdf_counter = 0
         self.margin = 0
+        self.story = []
+        self.pdf_filename = f"Medical Report {self.pdf_counter}.pdf"
+        self.doc = SimpleDocTemplate(self.pdf_filename, pagesize=letter)
+
 
 
 
@@ -99,6 +103,8 @@ class File:
         self.Dwindow.add_image_button.clicked.connect(self.load_image)
         self.Dwindow.save_button.clicked.connect(self.create_pdf_file)
         self.Dwindow.save_button.clicked.connect(self.Dwindow.close)
+        self.Dwindow.add_new_page_button.clicked.connect(self.add_new_pdf_page)
+
 
 
     def styles(self):
@@ -172,6 +178,8 @@ class File:
         self.Qwindow.graphicsView_channel2.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.Qwindow.graphicsView_channel2.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
+
+
     def toggle_channel_animation(self, ani_num):
         if ani_num == None:
             msg = QMessageBox()
@@ -211,6 +219,10 @@ class File:
             return  ["None", "channel2"]
         else:
             return ["None" ,"None"]
+
+    def zoom_out(self):
+        # Implement your custom button functionality here
+        pass  # Replace with your code
 
 
     def increase_speed(self):
@@ -391,12 +403,47 @@ class File:
                       self.Qwindow.graphicsView_channel1.setScene(scene1)
                       scene1.addWidget(canvas1)
                       self.toolbar_1 = NavigationToolbar(canvas1, self.Qwindow)
-                      for child in self.toolbar_1.findChildren(QtWidgets.QToolButton):
-                          child.setStyleSheet("background-color: #849dad; ")
-                      unwanted_buttons = ['Customize', 'Home']
+
+                      # Remove the Home and Customize buttons from the toolbar
+                      unwanted_buttons = ['Customize', 'Home', 'Subplots']
                       for x in self.toolbar_1.actions():
                           if x.text() in unwanted_buttons:
                               self.toolbar_1.removeAction(x)
+
+                      # Finding The Zoom In button and changing it's icon
+                      actions = self.toolbar_1.actions()
+
+                      fourth_action = actions[4]
+                      Zero_action = actions[0]
+                      first_action = actions[1]
+                      second_action = actions[3]
+                      sixth_action = actions[6]
+
+                      zoom_in_icon = icon("fa.search-plus",
+                                          color="white")
+                      left_arrow_icon = icon("ei.arrow-left", color="white")
+                      right_arrow_icon = icon("ei.arrow-right", color="white")
+                      pan_icon = icon("fa.hand-paper-o", color="white")
+                      screenshot_icon = icon("ri.screenshot-2-fill", color="white")
+
+                      fourth_action.setIcon(zoom_in_icon)
+                      Zero_action.setIcon(left_arrow_icon)
+                      first_action.setIcon(right_arrow_icon)
+                      second_action.setIcon(pan_icon)
+                      sixth_action.setIcon(screenshot_icon)
+
+                      zoom_out_icon = icon("fa.search-minus", color="white")
+                      zoom_out_button1 = QtWidgets.QAction(zoom_out_icon, "Zoom Out", self.Qwindow)
+
+
+                      def zoom_out_graph1():
+                          pass  # Replace with your code
+
+                      zoom_out_button1.triggered.connect(zoom_out_graph1)
+                      self.toolbar_1.insertAction(self.toolbar_1.actions()[4], zoom_out_button1)
+                      for child in self.toolbar_1.findChildren(QtWidgets.QToolButton):
+                          child.setStyleSheet("background-color: #849dad; ")
+
                       self.Qwindow.pause_button.show()
                       self.Qwindow.rewind_button1.show()
                       self.Qwindow.verticalLayout_toolbar1.addWidget(self.toolbar_1)
@@ -451,16 +498,49 @@ class File:
                        canvas2 = FigureCanvasQTAgg(self.fig2)
                        self.Qwindow.graphicsView_channel2.setScene(scene2)
                        scene2.addWidget(canvas2)
-                       toolbar_2 = NavigationToolbar(canvas2, self.Qwindow)
-                       for child in toolbar_2.findChildren(QtWidgets.QToolButton):
-                           child.setStyleSheet("background-color: #849dad; ")
-                       unwanted_buttons = ['Customize', 'Home']
-                       for x in toolbar_2.actions():
+                       self.toolbar_2 = NavigationToolbar(canvas2, self.Qwindow)
+
+                       # Remove the Home and Customize buttons from the toolbar
+                       unwanted_buttons = ['Customize', 'Home', 'Subplots']
+                       for x in self.toolbar_2.actions():
                            if x.text() in unwanted_buttons:
-                               toolbar_2.removeAction(x)
+                               self.toolbar_2.removeAction(x)
+
+                       # Finding The Zoom In button and changing it's icon
+                       actions = self.toolbar_2.actions()
+
+                       fourth_action = actions[4]
+                       Zero_action = actions[0]
+                       first_action = actions[1]
+                       second_action = actions[3]
+                       sixth_action = actions[6]
+
+                       zoom_in_icon = icon("fa.search-plus",
+                                           color="white")
+                       left_arrow_icon = icon("ei.arrow-left", color="white")
+                       right_arrow_icon = icon("ei.arrow-right", color="white")
+                       pan_icon = icon("fa.hand-paper-o", color="white")
+                       screenshot_icon = icon("ri.screenshot-2-fill", color="white")
+
+                       fourth_action.setIcon(zoom_in_icon)
+                       Zero_action.setIcon(left_arrow_icon)
+                       first_action.setIcon(right_arrow_icon)
+                       second_action.setIcon(pan_icon)
+                       sixth_action.setIcon(screenshot_icon)
+                       # Creating an Icon for the Zoom Out button and Creating the button Itself
+                       zoom_out_icon = icon("fa.search-minus", color="white")
+                       zoom_out_button2 = QtWidgets.QAction(zoom_out_icon, "Zoom Out", self.Qwindow)
+
+                       def zoom_out_graph2():
+                           pass  # Replace with your code
+
+                       zoom_out_button2.triggered.connect(zoom_out_graph2)
+                       self.toolbar_2.insertAction(self.toolbar_2.actions()[4], zoom_out_button2)
+                       for child in self.toolbar_2.findChildren(QtWidgets.QToolButton):
+                           child.setStyleSheet("background-color: #849dad;")
                        self.Qwindow.pause_button_2.show()
                        self.Qwindow.rewind_button2.show()
-                       self.Qwindow.verticalLayout_toolbar2.addWidget(toolbar_2)
+                       self.Qwindow.verticalLayout_toolbar2.addWidget(self.toolbar_2)
 
 
 
@@ -541,28 +621,30 @@ class File:
         else:
             print("File dialog canceled or encountered an error.")
 
+
     def create_pdf_file(self):
-        # Create a PDF document
-        pdf_filename = f"text_and_image{self.pdf_counter}.pdf"
-        doc = SimpleDocTemplate(pdf_filename, pagesize=letter)
-        # Create a story (content) for the PDF
-        story = []
+        self.add_new_pdf_page()
+        self.doc.build(self.story)
+        # self.pdf_counter_name+=1
+
+
+    def add_new_pdf_page(self):
+ 
 
         # Add an image to the PDF
         pixmap = self.Dwindow.screenshot_section.pixmap()
-        image_width = pixmap.width()
-        image_height = pixmap.height()
-
+        
         # Convert QPixmap to PIL Image
         image = QImage(pixmap)
-        image_filename = "temp_image.png"  # Specify a filename
+        
+        # Specify a unique filename for each image
+        image_filename = f"temp_image_{self.pdf_counter}.png"
         image.save(image_filename)
-        pil_image = PILImage.open(image_filename)
-
+        
         # Add the image to the PDF
         pdf_image = Image(image_filename, width=8 * inch, height=4 * inch)
-        story.append(pdf_image)
-        story.append(Spacer(1, 0.5 * inch))
+        self.story.append(pdf_image)
+        self.story.append(Spacer(1, 0.5 * inch))
 
         # Add text to the PDF
         text = self.Dwindow.comment_section.text()
@@ -570,13 +652,17 @@ class File:
         text_style.alignment = 1  # 1 represents center alignment
         text_style.fontSize = 14  # Set font size to 12px
         paragraph = Paragraph(text, text_style)
-        story.append(paragraph)
+        self.story.append(paragraph)
 
         # Build the PDF document
-        doc.build(story)
-        self.pdf_counter+=1
+        self.pdf_counter += 1
+        self.story.append(PageBreak())
 
-        print(f"PDF saved as '{pdf_filename}'")
+        empty_pixmap = QPixmap()  # Create an empty QPixmap
+        self.Dwindow.screenshot_section.setPixmap(empty_pixmap)
+        self.Dwindow.comment_section.setText("")
+
+
 
 
 

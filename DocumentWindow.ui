@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>849</width>
-    <height>716</height>
+    <width>902</width>
+    <height>843</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -22,8 +22,8 @@
      <rect>
       <x>20</x>
       <y>10</y>
-      <width>801</width>
-      <height>331</height>
+      <width>861</width>
+      <height>451</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -37,10 +37,10 @@ background-color: White;</string>
    <widget class="QLineEdit" name="comment_section">
     <property name="geometry">
      <rect>
-      <x>160</x>
-      <y>460</y>
-      <width>531</width>
-      <height>131</height>
+      <x>110</x>
+      <y>570</y>
+      <width>671</width>
+      <height>141</height>
      </rect>
     </property>
     <property name="font">
@@ -59,8 +59,8 @@ border: 1px solid #52616B</string>
    <widget class="QPushButton" name="save_button">
     <property name="geometry">
      <rect>
-      <x>360</x>
-      <y>630</y>
+      <x>390</x>
+      <y>760</y>
       <width>131</width>
       <height>31</height>
      </rect>
@@ -70,6 +70,9 @@ border: 1px solid #52616B</string>
       <pointsize>-1</pointsize>
       <bold>true</bold>
      </font>
+    </property>
+    <property name="cursor">
+     <cursorShape>OpenHandCursor</cursorShape>
     </property>
     <property name="styleSheet">
      <string notr="true">/*background-color:#C9D6DF;*/
@@ -98,8 +101,8 @@ QPushButton:pressed {
    <widget class="QPushButton" name="add_image_button">
     <property name="geometry">
      <rect>
-      <x>670</x>
-      <y>350</y>
+      <x>730</x>
+      <y>470</y>
       <width>151</width>
       <height>31</height>
      </rect>
@@ -109,6 +112,9 @@ QPushButton:pressed {
       <pointsize>-1</pointsize>
       <bold>true</bold>
      </font>
+    </property>
+    <property name="cursor">
+     <cursorShape>OpenHandCursor</cursorShape>
     </property>
     <property name="styleSheet">
      <string notr="true">/*background-color:#C9D6DF;*/
@@ -133,11 +139,11 @@ QPushButton:pressed {
      <string>Add an Image</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton">
+   <widget class="QPushButton" name="add_new_page_button">
     <property name="geometry">
      <rect>
-      <x>670</x>
-      <y>640</y>
+      <x>710</x>
+      <y>750</y>
       <width>171</width>
       <height>41</height>
      </rect>
@@ -147,6 +153,9 @@ QPushButton:pressed {
       <pointsize>11</pointsize>
       <bold>true</bold>
      </font>
+    </property>
+    <property name="cursor">
+     <cursorShape>OpenHandCursor</cursorShape>
     </property>
     <property name="styleSheet">
      <string notr="true">color:rgb(51, 153, 0);</string>
@@ -161,8 +170,8 @@ QPushButton:pressed {
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>310</x>
-      <y>410</y>
+      <x>360</x>
+      <y>530</y>
       <width>201</width>
       <height>31</height>
      </rect>
@@ -186,7 +195,7 @@ QPushButton:pressed {
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>849</width>
+     <width>902</width>
      <height>22</height>
     </rect>
    </property>
