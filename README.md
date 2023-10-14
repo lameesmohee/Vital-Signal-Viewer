@@ -32,6 +32,8 @@ The Multi-Signal Viewer Application is a Python-based desktop application develo
   Users can link the two graphs together, ensuring that they display the same time frames, signal speed, and viewport settings. If one graph is zoomed or panned, the other graph automatically synchronizes.
 - #### Cine Mode:
   Signals are displayed in a cine mode, simulating real-time monitoring, similar to ICU monitors. Users can also rewind the signal to the beginning.
+- #### Exporting & Reporting:
+  Users can construct comprehensive reports containing one or more snapshots of the graphs, along with detailed data statistics for the displayed signals. 
 - #### User Controls:
   The application provides a range of user-friendly controls, including options to:
   - Change signal colors
@@ -44,6 +46,29 @@ The Multi-Signal Viewer Application is a Python-based desktop application develo
   - Move signals between graphs
 
 ## Project Demo
+
+## Screenshots
+![Uploading one signal](https://github.com/lameesmohee/Vital-Signal-Viewer/blob/main/project%20demo%20pics/Capture.PNG)
+![Uploading Two signals at the same Port](https://github.com/lameesmohee/Vital-Signal-Viewer/blob/main/project%20demo%20pics/Capture2.PNG)
+![Uploading one signal in each port](https://github.com/lameesmohee/Vital-Signal-Viewer/blob/main/project%20demo%20pics/Capture3.PNG)
+![Creating a medical report](https://github.com/lameesmohee/Vital-Signal-Viewer/blob/main/project%20demo%20pics/Capture4.PNG)
+![Felling in the report sections](https://github.com/lameesmohee/Vital-Signal-Viewer/blob/main/project%20demo%20pics/Capture5.PNG)
+
+## Made by:
+
+| Name                           | Section | BN  |
+| ------------------------------ | ------- | --- |
+| [Lama Zakaria Hassan Diab](https://github.com/lamalozo)              | 2 | 6  |
+| [Lamees Mohamed Mohee Eldeen](https://github.com/lameesmohee)        | 2 | 7 |
+| [Salema Abdeltawab](https://github.com/SalmaAbeltawab)        | 1 | 29 |
+
+- Course Name : Digital Signal Processing .
+
+## Submitted to:
+
+- Prof. Tamer Basha & Eng. Abdullah Darwish
+
+All rights reserved Â© 2023 to Team 9 - Systems & Biomedical Engineering, Cairo University (Class 2025)
 
 
 
