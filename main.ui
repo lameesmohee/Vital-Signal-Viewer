@@ -665,6 +665,9 @@ QPushButton:pressed {
     <property name="text">
      <string>Apply</string>
     </property>
+    <property name="shortcut">
+     <string>Ctrl+A</string>
+    </property>
    </widget>
    <widget class="QWidget" name="verticalLayoutWidget">
     <property name="geometry">
@@ -672,7 +675,7 @@ QPushButton:pressed {
       <x>820</x>
       <y>30</y>
       <width>121</width>
-      <height>65</height>
+      <height>56</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -693,6 +696,9 @@ QPushButton:pressed {
        <property name="text">
         <string>Channel 1</string>
        </property>
+       <property name="shortcut">
+        <string>Ctrl+1</string>
+       </property>
        <property name="checked">
         <bool>false</bool>
        </property>
@@ -711,6 +717,9 @@ QPushButton:pressed {
        </property>
        <property name="text">
         <string>Channel 2</string>
+       </property>
+       <property name="shortcut">
+        <string>Ctrl+2</string>
        </property>
        <property name="checked">
         <bool>false</bool>
@@ -780,6 +789,9 @@ QPushButton:pressed {
     <property name="text">
      <string>➖</string>
     </property>
+    <property name="shortcut">
+     <string>Ctrl+D</string>
+    </property>
    </widget>
    <widget class="QPushButton" name="plus_button">
     <property name="geometry">
@@ -825,6 +837,9 @@ QPushButton:pressed {
       <width>16</width>
       <height>16</height>
      </size>
+    </property>
+    <property name="shortcut">
+     <string>Ctrl+U</string>
     </property>
    </widget>
    <widget class="QWidget" name="verticalLayoutWidget_2">
@@ -956,6 +971,9 @@ QTableWidget QHeaderView::section { text-align: center; }
     <property name="text">
      <string>❚❚</string>
     </property>
+    <property name="shortcut">
+     <string>Ctrl+P</string>
+    </property>
    </widget>
    <widget class="QPushButton" name="pause_button_2">
     <property name="geometry">
@@ -981,6 +999,9 @@ QTableWidget QHeaderView::section { text-align: center; }
     </property>
     <property name="text">
      <string/>
+    </property>
+    <property name="shortcut">
+     <string>Ctrl+R</string>
     </property>
    </widget>
    <widget class="QPushButton" name="rewind_button2">
@@ -1018,6 +1039,9 @@ color:#849dad;</string>
     <property name="text">
      <string>Link</string>
     </property>
+    <property name="shortcut">
+     <string>Ctrl+L</string>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -1026,7 +1050,7 @@ color:#849dad;</string>
      <x>0</x>
      <y>0</y>
      <width>1906</width>
-     <height>26</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -1043,10 +1067,16 @@ color:#849dad;</string>
    <property name="text">
     <string>Open file</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
   </action>
   <action name="make_pdf">
    <property name="text">
     <string>Make a PDF</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+M</string>
    </property>
   </action>
  </widget>
