@@ -104,6 +104,7 @@ class File:
         self.pdf_counter = 0
         self.margin = 0
         self.page_container = []
+
         self.pdf_filename = f"Medical Report {self.pdf_counter}.pdf"
         self.doc = SimpleDocTemplate(self.pdf_filename, pagesize=letter)
         self.Qwindow.tableWidget.hide()
@@ -144,7 +145,7 @@ class File:
         self.Dwindow.add_new_page_button.clicked.connect(self.add_new_pdf_page)
 
     def Ui_graph_channel2(self):  # Styling the UI of the 2nd graph
-        self.fig2 = plt.figure(figsize=(899 / 80, 429 / 80), dpi=80)
+
         self.fig2.set_facecolor('#F0F5F9')
         self.ax2 = self.fig2.add_subplot(111)
         self.ax2.set_facecolor('#F0F5F9')
@@ -168,7 +169,7 @@ class File:
         self.ax2.set_ylabel("Vital Signal")
 
     def Ui_graph_channel1(self):  # Styling the UI for the 1st Graph
-        self.fig = plt.figure(figsize=(899 / 80, 429 / 80), dpi=80)
+
         self.fig.set_facecolor('#F0F5F9')
         self.ax = self.fig.add_subplot(111)
         left_margin = 0.1  # Adjust this value as needed
@@ -671,7 +672,13 @@ class File:
             del count_files_channel1[file_part]
             print(self.visited_channel1)
             self.visited_channel1 = [file for idx, file in enumerate(self.visited_channel1) if file != file_part]
+            print("hallo")
             print(len(self.visited_channel1))
+
+            if len(self.visited_channel1) == 0:
+                self.specific_row = 0
+                self.frames_channel1 += 300
+
             for item in self.hidden_line_ch1.items():
                 if item[0] == file_part:
                     self.hidden_idx_1 = item[1]
@@ -800,6 +807,11 @@ class File:
             print(self.visited_channel2)
             self.visited_channel2 = [file2 for idx2, file2 in enumerate(self.visited_channel2) if file2 != file_part]
             print(len(self.visited_channel2))
+
+            if len(self.visited_channel2) == 0:
+                self.specific_row_2 = 0
+                self.frames_channel2 += 300
+
             for item2 in self.hidden_line_ch2.items():
                 if item2[0] == file_part:
                     self.hidden_idx_2 = item2[1]

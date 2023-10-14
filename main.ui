@@ -672,7 +672,7 @@ QPushButton:pressed {
       <x>820</x>
       <y>30</y>
       <width>121</width>
-      <height>56</height>
+      <height>65</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -1026,7 +1026,7 @@ color:#849dad;</string>
      <x>0</x>
      <y>0</y>
      <width>1906</width>
-     <height>22</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
