@@ -52,6 +52,8 @@ class File:
         self.y_fig2 = {}
         self.pause_ch1 = False
         self.pause_ch2 = False
+        self.stop_ch2 = True
+        self.stop_ch2 = True
         self.present_line1 = {}
         self.present_line2 = {}
         self.files_index_ch1 = {}
@@ -137,6 +139,7 @@ class File:
         self.Qwindow.pause_button.clicked.connect(lambda: self.toggle_channel_animation(self.ani))
         self.Qwindow.pause_button_2.clicked.connect(lambda: self.toggle_channel_animation(self.ani2))
         self.Qwindow.make_pdf.triggered.connect(self.open_window)
+        self.Qwindow.link_button.toggled.connect(self.link_two_graphs)
         self.Dwindow.add_image_button.clicked.connect(self.load_image)
         self.Dwindow.save_button.clicked.connect(self.create_pdf_file)
         self.Dwindow.save_button.clicked.connect(self.Dwindow.close)
@@ -256,9 +259,11 @@ class File:
         if (ani_num == self.ani):
             if self.Qwindow.pause_button.text() == "►":
                 self.Qwindow.pause_button.setText("❚❚")
+
                 self.ani.event_source.start()
             else:
                 self.Qwindow.pause_button.setText("►")
+
                 self.ani.event_source.stop()
         else:
 
@@ -267,6 +272,7 @@ class File:
                 self.ani2.event_source.start()
             else:
                 self.Qwindow.pause_button_2.setText("►")
+
                 self.ani2.event_source.stop()
 
     def Zoom_out_channel1(self):
@@ -284,8 +290,8 @@ class File:
     def link_two_graphs(self):  ## to linke two graphs
         if self.Qwindow.link_button.isChecked():
             self.link = True
-            x_limits = (
-            floor((min(self.data_x_limits)) - 0.05), ceil(max(self.data_x_limits) + 0.01))  ## Normalize limits
+            print ("kkkkkkkkkkkkkkk")
+            x_limits = (floor((min(self.data_x_limits)) - 0.05), ceil(max(self.data_x_limits) + 0.01))  ## Normalize limits
             y_limits = (floor((min(self.data_y_limits)) - 0.05), ceil(max(self.data_y_limits) + 0.01))
             ## same time frames
 
@@ -534,8 +540,21 @@ class File:
                 msg.exec_()
 
     def rewind_channel1(self):  ## rewiind channels 30 points as 30 milisecond (ms) for channel1
+        if self.specific_row >= 62:
+            return_value = 31
+            self.begin_value = self.specific_row - 2*31
 
-        self.specific_row -= 31  ## return points 30 point
+        else:
+            if self.specific_row >= 31:
+                return_value = 31
+                self.begin_value = 0
+
+            else:
+                return_value = self.specific_row
+                self.begin_value = 0
+
+        self.specific_row -= return_value  ## return points 30 point
+        self.last_value = self.specific_row
         listx_1 = []
         listy_1 = []
         listx_11 = []
@@ -550,11 +569,22 @@ class File:
 
            ## store previous data which I can see when I rewind
             if item[0] not in self.present_line1.keys():
-                listx_11 = item[1][0][self.specific_row - 31: self.specific_row]
-                listy_11 = item[1][1][self.specific_row - 31: self.specific_row]
+                print("hallo")
+                print(listx_11)
+                # print(item[1][0])
+                print(item[1][0][self.begin_value])
+                print(item[1][0][self.last_value])
+
+                listx_11 = item[1][0][self.begin_value : self.last_value]
+                listy_11 = item[1][1][self.begin_value : self.last_value]
+
                 for idx in range(len(listx_11)):
                     self.x_fig1[item[0]].append(listx_11[idx])
                     self.y_fig1[item[0]].append(listy_11[idx])
+
+
+
+
 
             else:
                 print(len(item[1][0]))
@@ -583,7 +613,23 @@ class File:
 
 
     def rewind_channel2(self):
-        self.specific_row_2 -= 31
+
+        if self.specific_row_2 >= 62:
+            return_value_2 = 31
+            self.begin_value_2 = self.specific_row_2 - 2 * 31
+
+        else:
+            if self.specific_row_2 >= 31:
+                return_value_2 = 31
+                self.begin_value_2 = 0
+
+            else:
+                return_value_2 = self.specific_row_2
+                self.begin_value_2 = 0
+
+        self.specific_row_2 -= return_value_2  ## return points 30 point
+        self.last_value_2 = self.specific_row_2
+
         listx_2 = []
         listy_2 = []
         listx_22 = []
@@ -599,8 +645,8 @@ class File:
 
 
             if item[0] not in self.present_line2.keys():
-                listx_22 = item[1][0][self.specific_row_2 - 31: self.specific_row_2]
-                listy_22 = item[1][1][self.specific_row_2 - 31: self.specific_row_2]
+                listx_22 = item[1][0][self.begin_value_2:self.last_value_2]
+                listy_22 = item[1][1][self.begin_value_2:self.last_value_2]
                 for idx in range(len(listx_22)):
                     self.x_fig2[item[0]].append(listx_22[idx])
                     self.y_fig2[item[0]].append(listy_22[idx])
@@ -670,7 +716,7 @@ class File:
 
             print(self.files_name)  ## get name of file
             for file in self.files_name:
-                file_part = file.split('/')[-1].split('_')[0]
+                file_part = file.split('/')[-1].split('.')[0]
                 if file_part == file_namee:
                     file_namee = file
 
@@ -740,8 +786,9 @@ class File:
 
             self.visited_channel1 = [file for idx, file in enumerate(self.visited_channel1) if file != file_part]
             print(len(self.visited_channel1))
-
-
+            if len(self.visited_channel1) == 0:
+                self.specific_row = 0
+                self.frames_channel1 += 300
 
             for item in self.hidden_line_ch1.items():
                 if item[0] == file_part:
@@ -828,7 +875,7 @@ class File:
                     self.present_line1[self.no_of_line - 1] = self.current_data
                     for key in self.dic_channel1.items():
                         print(key[1][0][self.current_data])
-                        begin_idx_ch1 = key[1][0][self.current_data]
+                        begin_idx_ch1 = key[1][0][self.current_data+10]
                         break
                     for idx in range(len(self.data_xline)): ## get index of first line to start from it
 
@@ -907,11 +954,15 @@ class File:
        ## channel2 /graph 2
         if channel2 == "None" and file_part in self.visited_channel2:
 
+
             del count_files_channel2[file_part]
             print(self.visited_channel2)
 
             self.visited_channel2 = [file2 for idx2, file2 in enumerate(self.visited_channel2) if file2 != file_part]
             print(len(self.visited_channel2))
+            if len(self.visited_channel2) == 0:
+                self.specific_row_2 = 0
+                self.frames_channel2 += 300
 
 
 
@@ -1136,7 +1187,7 @@ class File:
         if file_name:
             self.files_name.append(file_name)
             file_name = str(file_name)
-            self.line = file_name.split('/')[-1].split('_')[0]
+            self.line = file_name.split('/')[-1].split('.')[0]
             self.Qwindow.signals_name.addItem(self.line)
             self.time_list, self.signal_values_list = self.read_ecg_data_from_csv(file_name)
             self.row_counter = self.row_counter + 1
