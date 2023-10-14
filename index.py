@@ -44,6 +44,8 @@ class File:
         self.y_fig2 = {}
         self.pause_ch1 = False
         self.pause_ch2 = False
+        self.play_ch1 = True
+        self.play_ch2 = True
         self.present_line1 = {}
         self.present_line2 = {}
         self.files_index_ch1 = {}
@@ -124,12 +126,21 @@ class File:
         self.Qwindow.rewind_button2.clicked.connect(self.rewind_channel2)
         QCoreApplication.processEvents()
         self.Qwindow.rewind_button1.clicked.connect(self.rewind_channel1)
+        QCoreApplication.processEvents()
         self.Qwindow.pause_button.clicked.connect(lambda: self.toggle_channel_animation(self.ani))
+        QCoreApplication.processEvents()
         self.Qwindow.pause_button_2.clicked.connect(lambda: self.toggle_channel_animation(self.ani2))
+        QCoreApplication.processEvents()
+        self.Qwindow.link_button.toggled.connect(self.link_two_graphs)
+        QCoreApplication.processEvents()
         self.Qwindow.make_pdf.triggered.connect(self.open_window)
+        QCoreApplication.processEvents()
         self.Dwindow.add_image_button.clicked.connect(self.load_image)
+        QCoreApplication.processEvents()
         self.Dwindow.save_button.clicked.connect(self.create_pdf_file)
+        QCoreApplication.processEvents()
         self.Dwindow.save_button.clicked.connect(self.Dwindow.close)
+        QCoreApplication.processEvents()
         self.Dwindow.add_new_page_button.clicked.connect(self.add_new_pdf_page)
 
     def Ui_graph_channel2(self):  # Styling the UI of the 2nd graph
@@ -222,27 +233,49 @@ class File:
         self.Qwindow.graphicsView_channel2.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
     def toggle_channel_animation(self, ani_num):
-        if ani_num is None:
+        if ani_num == None:
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Warning)
             msg.setInformativeText("No animations to toggle.")
             msg.show()
             msg.exec_()
             return
-        if ani_num == self.ani:
+        if (ani_num == self.ani):
+
             if self.Qwindow.pause_button.text() == "►":
                 self.Qwindow.pause_button.setText("❚❚")
+                self.play_ch1 = True
+
                 self.ani.event_source.start()
             else:
                 self.Qwindow.pause_button.setText("►")
+                self.play_ch1 = False
+
                 self.ani.event_source.stop()
         else:
+
             if self.Qwindow.pause_button_2.text() == "►":
                 self.Qwindow.pause_button_2.setText("❚❚")
+                self.play_ch2 = True
                 self.ani2.event_source.start()
             else:
                 self.Qwindow.pause_button_2.setText("►")
+                self.play_ch2 = False
+
                 self.ani2.event_source.stop()
+
+        if self.link:
+            if self.play_ch1:
+                self.ani2.event_source.start()
+
+            elif not self.play_ch1:
+                self.ani2.event_source.stop()
+
+            else:
+                if self.play_ch2:
+                    self.ani.event_source.start()
+                else:
+                    self.ani.event_source.stop()
 
     def Zoom_out_channel1(self):
         y_min, y_max = self.ax.get_ylim()
@@ -266,6 +299,8 @@ class File:
             self.ax2.set_xlim(x_limits)
             self.ax.set_ylim(y_limits)
             self.ax2.set_ylim(y_limits)
+        else:
+            self.link = False
 
     def animate_fig2(self, i):  # To animate graph 2
         if self.pause_ch2 or self.rewind_ch2:  # to Pausr or Rewind Graph1
@@ -428,70 +463,124 @@ class File:
                 msg.show()
                 msg.exec_()
 
-    def rewind_channel1(self):  # rewiind channels 30 points as 30 milisecond (ms) for channel1
-        self.specific_row -= 31  # return points 30 point
+    def rewind_channel1(self):  ## rewiind channels 30 points as 30 milisecond (ms) for channel1
+        if self.specific_row >= 62:
+            return_value = 31
+            self.begin_value = self.specific_row - 2 * 31
+
+        else:
+            if self.specific_row >= 31:
+                return_value = 31
+                self.begin_value = 0
+
+            else:
+                return_value = self.specific_row
+                self.begin_value = 0
+
+        self.specific_row -= return_value  ## return points 30 point
+        self.last_value = self.specific_row
         listx_1 = []
         listy_1 = []
         listx_11 = []
         listy_11 = []
-        # clear previous data
+        ## clear previous data
         self.x_fig1.clear()
         self.y_fig1.clear()
         for item in self.dic_channel1.items():
             print(item[0])
             self.x_fig1[item[0]] = []
             self.y_fig1[item[0]] = []
-            # store previous data which I can see when I rewind
+
+            ## store previous data which I can see when I rewind
             if item[0] not in self.present_line1.keys():
-                listx_11 = item[1][0][self.specific_row - 31: self.specific_row]
-                listy_11 = item[1][1][self.specific_row - 31: self.specific_row]
+                print("hallo")
+                print(listx_11)
+                # print(item[1][0])
+                print(item[1][0][self.begin_value])
+                print(item[1][0][self.last_value])
+
+                listx_11 = item[1][0][self.begin_value: self.last_value]
+                listy_11 = item[1][1][self.begin_value: self.last_value]
+
                 for idx in range(len(listx_11)):
                     self.x_fig1[item[0]].append(listx_11[idx])
                     self.y_fig1[item[0]].append(listy_11[idx])
+
+
+
+
+
             else:
                 print(len(item[1][0]))
                 for data in range(len(item[1][0])):
                     print(item[1][0][data])
                     if item[1][0][data] >= listx_11[0]:
-                        listx_1 = item[1][0][data: data+31]
-                        listy_1 = item[1][1][data: data+31]
+                        listx_1 = item[1][0][data: data + 31]
+                        listy_1 = item[1][1][data: data + 31]
                         break
+
                 for idx in range(len(listx_1)):
                     self.x_fig1[item[0]].append(listx_1[idx])
                     self.y_fig1[item[0]].append(listy_1[idx])
+
+                print("hallo")
                 print(self.present_line1[item[0]])
                 self.present_line1[item[0]] -= 31
+
         self.rewind_ch1 = True
 
     def rewind_channel2(self):
-        self.specific_row_2 -= 31
+
+        if self.specific_row_2 >= 62:
+            return_value_2 = 31
+            self.begin_value_2 = self.specific_row_2 - 2 * 31
+
+        else:
+            if self.specific_row_2 >= 31:
+                return_value_2 = 31
+                self.begin_value_2 = 0
+
+            else:
+                return_value_2 = self.specific_row_2
+                self.begin_value_2 = 0
+
+        self.specific_row_2 -= return_value_2  ## return points 30 point
+        self.last_value_2 = self.specific_row_2
+
         listx_2 = []
         listy_2 = []
         listx_22 = []
         listy_22 = []
+        # self.frames_channel1 += 30
+        # self.ani.event_source.stop()
         self.x_fig2.clear()
         self.y_fig2.clear()
         for item in self.dic_channel2.items():
             print(item[0])
             self.x_fig2[item[0]] = []
             self.y_fig2[item[0]] = []
+
             if item[0] not in self.present_line2.keys():
-                listx_22 = item[1][0][self.specific_row_2 - 31: self.specific_row_2]
-                listy_22 = item[1][1][self.specific_row_2 - 31: self.specific_row_2]
+                listx_22 = item[1][0][self.begin_value_2:self.last_value_2]
+                listy_22 = item[1][1][self.begin_value_2:self.last_value_2]
                 for idx in range(len(listx_22)):
                     self.x_fig2[item[0]].append(listx_22[idx])
                     self.y_fig2[item[0]].append(listy_22[idx])
+
             else:
                 print(len(item[1][0]))
                 for data in range(len(item[1][0])):
                     print(item[1][0][data])
                     if item[1][0][data] >= listx_22[0]:
-                        listx_2 = item[1][0][data : data+31]
-                        listy_2 = item[1][1][data : data+31]
+                        listx_2 = item[1][0][data: data + 31]
+                        listy_2 = item[1][1][data: data + 31]
                         break
+
                 for idx in range(len(listx_2)):
                     self.x_fig2[item[0]].append(listx_2[idx])
                     self.y_fig2[item[0]].append(listy_2[idx])
+
+                print("hallo")
                 print(self.present_line2[item[0]])
                 self.present_line2[item[0]] -= 31
         self.rewind_ch2 = True
@@ -508,6 +597,9 @@ class File:
             return ["None", "channel2"]
         else:
             return ["None", "None"]
+
+
+
 
     def channels_checked(self):  # fun return which channel and path of file which selected
         check_list = self.Ischecked()
@@ -531,7 +623,7 @@ class File:
         else:
             print(self.files_name)  # get name of file
             for file in self.files_name:
-                file_part = file.split('/')[-1].split('_')[0]
+                file_part = file.split('/')[-1].split('.')[0]
                 if file_part == file_namee:
                     file_namee = file
                     # Add signal in visited list
@@ -560,6 +652,9 @@ class File:
             self.data_x_limits, self.data_y_limits = self.read_ecg_data_from_csv('C:/Users/lama zakaria/Desktop/Vital-Signal-Viewer/Vital-Signals/EMG_Dataset.csv')
             self.time_list, self.signal_values_list = self.read_ecg_data_from_csv(file_namee)
             return file_part, file_namee, channel1, channel2
+
+
+
     def Plot(self):  # plot animation
         file_part, file_namee, channel1, channel2 = self.channels_checked()
         # get range of data of signal
@@ -592,6 +687,9 @@ class File:
                 self.lines1[idx_line_ch1[0]], = self.ax.plot([], [], label=self.name_files_ch1[idx_line_ch1[0]],
                                                              color=self.colors_channel1[idx_line_ch1[0]])
             self.ax.legend()
+
+
+
         # Channel 1 /graph 1
         if channel1 == "channel1":
             for item in count_files_channel1.items():  # get no of repeateed signal
@@ -693,6 +791,9 @@ class File:
                     self.Qwindow.pause_button.show()
                     self.Qwindow.rewind_button1.show()
                     self.Qwindow.verticalLayout_toolbar1.addWidget(self.toolbar_1)
+
+
+
         # channel2 /graph 2
         if channel2 == "None" and file_part in self.visited_channel2:
             del count_files_channel2[file_part]
@@ -840,7 +941,7 @@ class File:
         if file_name:
             self.files_name.append(file_name)
             file_name = str(file_name)
-            self.line = file_name.split('/')[-1].split('_')[0]
+            self.line = file_name.split('/')[-1].split('.')[0]
             self.Qwindow.signals_name.addItem(self.line)
             self.time_list, self.signal_values_list = self.read_ecg_data_from_csv(file_name)
             self.row_counter = self.row_counter + 1
