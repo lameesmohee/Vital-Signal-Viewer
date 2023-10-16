@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>902</width>
-    <height>843</height>
+    <height>544</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,52 +17,13 @@
    <string notr="true">background-color:#F0F5F9</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QLabel" name="screenshot_section">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>10</y>
-      <width>861</width>
-      <height>451</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">border: 1px solid #52616B;;
-background-color: White;</string>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="comment_section">
-    <property name="geometry">
-     <rect>
-      <x>110</x>
-      <y>570</y>
-      <width>671</width>
-      <height>141</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>12</pointsize>
-     </font>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">Background-color:White;
-border: 1px solid #52616B</string>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
    <widget class="QPushButton" name="save_button">
     <property name="geometry">
      <rect>
-      <x>390</x>
-      <y>760</y>
-      <width>131</width>
-      <height>31</height>
+      <x>370</x>
+      <y>430</y>
+      <width>161</width>
+      <height>41</height>
      </rect>
     </property>
     <property name="font">
@@ -101,84 +62,12 @@ QPushButton:pressed {
      <string>Ctrl+S</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="add_image_button">
-    <property name="geometry">
-     <rect>
-      <x>730</x>
-      <y>470</y>
-      <width>151</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>-1</pointsize>
-      <bold>true</bold>
-     </font>
-    </property>
-    <property name="cursor">
-     <cursorShape>OpenHandCursor</cursorShape>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">/*background-color:#C9D6DF;*/
-QPushButton {
-    background-color: #849dad; /* Background color*/
-    border: 2px solid #849dad; /* Border style*/
-    border-radius: 5px; /* Rounded corners */
-    color: #ffffff; /* Text color */
-    padding: 5px 15px; /* Padding around the text */
-    font-size: 14px; /* Text font size */
-}
-QPushButton:hover {
-    background-color: #708694; /* Background color on hover */
-    border: 2px solid #708694; /* Border style on hover */
-}
-QPushButton:pressed {
-    background-color: #52616B; /* Background color when pressed */
-    border: 2px solid #52616B; /* Border style when pressed */
-}</string>
-    </property>
-    <property name="text">
-     <string>Add an Image</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="add_new_page_button">
-    <property name="geometry">
-     <rect>
-      <x>710</x>
-      <y>750</y>
-      <width>171</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>11</pointsize>
-      <bold>true</bold>
-     </font>
-    </property>
-    <property name="cursor">
-     <cursorShape>OpenHandCursor</cursorShape>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">color:rgb(51, 153, 0);</string>
-    </property>
-    <property name="text">
-     <string>Add a New Page ➔</string>
-    </property>
-    <property name="shortcut">
-     <string>Ctrl+N</string>
-    </property>
-    <property name="flat">
-     <bool>true</bool>
-    </property>
-   </widget>
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>360</x>
-      <y>530</y>
-      <width>201</width>
+      <x>280</x>
+      <y>20</y>
+      <width>391</width>
       <height>31</height>
      </rect>
     </property>
@@ -192,7 +81,26 @@ QPushButton:pressed {
      <string notr="true">color:#849dad</string>
     </property>
     <property name="text">
-     <string>Add Your Comment Here</string>
+     <string>Add Your Comment On the snapshots</string>
+    </property>
+   </widget>
+   <widget class="QTextEdit" name="comment_section">
+    <property name="geometry">
+     <rect>
+      <x>110</x>
+      <y>70</y>
+      <width>681</width>
+      <height>341</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: white;
+</string>
     </property>
    </widget>
   </widget>

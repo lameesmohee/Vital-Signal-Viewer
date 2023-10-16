@@ -1,9 +1,14 @@
 import matplotlib
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Image, PageBreak
 from reportlab.lib.units import inch
-from PIL import Image as PILImage
+import glob
 from reportlab.platypus.doctemplate import Spacer
 from reportlab.lib import styles
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, PageBreak, Spacer, Paragraph, Table, TableStyle
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.units import inch
 matplotlib.use('Qt5Agg')
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWidgets import *
@@ -24,10 +29,12 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg, NavigationTool
 import numpy as np
 from qtawesome import icon
 from reportlab.lib.pagesizes import letter
-
+import os
 
 MainUI, _ = loadUiType(path.join(path.dirname(__file__), 'main.ui'))
 DocumentWindowUI, _ = loadUiType(path.join(path.dirname(__file__), 'DocumentWindow.ui'))
+
+
 class File:
     def __init__(self):
         self.ani_list = []
@@ -81,8 +88,8 @@ class File:
         self.lines2 = [None] * 100
         self.Qwindow = MainApp()
         self.Dwindow = DocumentWindow()
-        self.fig = plt.figure(figsize=(898 / 80, 345 / 80), dpi=80)
-        self.fig2 = plt.figure(figsize=(898 / 80, 345 / 80), dpi=80)
+        self.fig = plt.figure(figsize=(1450 / 80, 345 / 80), dpi=80)
+        self.fig2 = plt.figure(figsize=(1450 / 80, 345 / 80), dpi=80)
         self.mean = 0
         self.std = 0
         self.duration = 0
@@ -104,10 +111,12 @@ class File:
         self.pdf_counter = 0
         self.margin = 0
         self.page_container = []
-
         self.pdf_filename = f"Medical Report {self.pdf_counter}.pdf"
         self.doc = SimpleDocTemplate(self.pdf_filename, pagesize=letter)
         self.Qwindow.tableWidget.hide()
+        self.img_channel1_counter = 0
+        self.img_channel2_counter = 0
+        self.statistics_data = []
 
     def handle_button_push(self):
         self.Qwindow.open_file.triggered.connect(self.browse_file)
@@ -136,21 +145,18 @@ class File:
         QCoreApplication.processEvents()
         self.Qwindow.make_pdf.triggered.connect(self.open_window)
         QCoreApplication.processEvents()
-        self.Dwindow.add_image_button.clicked.connect(self.load_image)
-        QCoreApplication.processEvents()
         self.Dwindow.save_button.clicked.connect(self.create_pdf_file)
         QCoreApplication.processEvents()
         self.Dwindow.save_button.clicked.connect(self.Dwindow.close)
         QCoreApplication.processEvents()
-        self.Dwindow.add_new_page_button.clicked.connect(self.add_new_pdf_page)
 
-    def Ui_graph_channel2(self):  # Styling the UI of the 2nd graph
 
+    def Ui_graph_channel2(self):   # Styling the UI of the 2nd graph
         self.fig2.set_facecolor('#F0F5F9')
         self.ax2 = self.fig2.add_subplot(111)
         self.ax2.set_facecolor('#F0F5F9')
         left_margin = 0.1  # Adjust this value as needed
-        self.ax2.set_position([left_margin, 0.1, 0.83, 0.85])  # [left, bottom, width, height]
+        self.ax2.set_position([left_margin, 0.1, 0.78, 0.85])  # [left, bottom, width, height]
         self.ax2.set_facecolor('#F0F5F9')
         self.ax2.grid(True, color='gray', linestyle='--', alpha=0.5)
         self.ax2.xaxis.label.set_color('#708694')  # X-axis label
@@ -169,11 +175,10 @@ class File:
         self.ax2.set_ylabel("Vital Signal")
 
     def Ui_graph_channel1(self):  # Styling the UI for the 1st Graph
-
         self.fig.set_facecolor('#F0F5F9')
         self.ax = self.fig.add_subplot(111)
         left_margin = 0.1  # Adjust this value as needed
-        self.ax.set_position([left_margin, 0.1, 0.83, 0.85])    # [left, bottom, width, height]
+        self.ax.set_position([left_margin, 0.1, 0.78, 0.85])    # [left, bottom, width, height]
         self.ax.set_facecolor('#F0F5F9')
         self.ax.grid(True, color='gray', linestyle='--', alpha=0.5)
         self.ax.xaxis.label.set_color('#708694')  # X-axis label
@@ -222,7 +227,7 @@ class File:
         self.Qwindow.pause_button_2.setStyleSheet("background-color: #849dad;"
                                                   " color: white;"
                                                   "font-size: 16px")
-        self.Qwindow.setFixedSize(1930, 1000)
+        self.Qwindow.setFixedSize(1400, 1000)
         rewind_icon = icon("fa.backward", color='white')
         self.Qwindow.rewind_button1.setIcon(rewind_icon)
         self.Qwindow.rewind_button2.setIcon(rewind_icon)
@@ -245,33 +250,34 @@ class File:
 
             if self.Qwindow.pause_button.text() == "►":
                 self.Qwindow.pause_button.setText("❚❚")
+                shortcut1 = QShortcut(QKeySequence('Ctrl+P'), self.Qwindow)
+                shortcut1.activated.connect(self.Qwindow.pause_button.click)
                 self.play_ch1 = True
-
                 self.ani.event_source.start()
             else:
                 self.Qwindow.pause_button.setText("►")
+                shortcut1 = QShortcut(QKeySequence('Ctrl+P'), self.Qwindow)
+                shortcut1.activated.connect(self.Qwindow.pause_button.click)
                 self.play_ch1 = False
-
                 self.ani.event_source.stop()
         else:
-
             if self.Qwindow.pause_button_2.text() == "►":
                 self.Qwindow.pause_button_2.setText("❚❚")
+                shortcut2 = QShortcut(QKeySequence('Ctrl+B'), self.Qwindow)
+                shortcut2.activated.connect(self.Qwindow.pause_button_2.click)
                 self.play_ch2 = True
                 self.ani2.event_source.start()
             else:
                 self.Qwindow.pause_button_2.setText("►")
+                shortcut2 = QShortcut(QKeySequence('Ctrl+B'), self.Qwindow)
+                shortcut2.activated.connect(self.Qwindow.pause_button_2.click)
                 self.play_ch2 = False
-
                 self.ani2.event_source.stop()
-
         if self.link:
             if self.play_ch1:
                 self.ani2.event_source.start()
-
             elif not self.play_ch1:
                 self.ani2.event_source.stop()
-
             else:
                 if self.play_ch2:
                     self.ani.event_source.start()
@@ -650,7 +656,7 @@ class File:
                         break
                     break
             # default limits
-            self.data_x_limits, self.data_y_limits = self.read_ecg_data_from_csv('C:/Users/lama zakaria/Desktop/Vital-Signal-Viewer/Vital-Signals/EMG_Dataset.csv')
+            self.data_x_limits, self.data_y_limits = self.read_ecg_data_from_csv(r'C:\Users\delta\OneDrive\Desktop\deadline\task1-signal-viewer-dsp_fall23_task1_team_9\Vital-Signals\EMG_Dataset.csv')
             self.time_list, self.signal_values_list = self.read_ecg_data_from_csv(file_namee)
             return file_part, file_namee, channel1, channel2
 
@@ -761,10 +767,10 @@ class File:
                 self.ax.legend()  # set label to lines
                 if graph_ch1:  # show graph on graphics view
                     scene1 = QtWidgets.QGraphicsScene()
-                    canvas1 = FigureCanvasQTAgg(self.fig)
+                    self.canvas1 = FigureCanvasQTAgg(self.fig)
                     self.Qwindow.graphicsView_channel1.setScene(scene1)
-                    scene1.addWidget(canvas1)
-                    self.toolbar_1 = NavigationToolbar(canvas1, self.Qwindow)
+                    scene1.addWidget(self.canvas1)
+                    self.toolbar_1 = NavigationToolbar(self.canvas1, self.Qwindow)
                     # Remove the Home and Customize buttons from the toolbar
                     unwanted_buttons = ['Customize', 'Home', 'Subplots']
                     for x in self.toolbar_1.actions():
@@ -777,6 +783,9 @@ class File:
                     first_action = actions[1]
                     second_action = actions[3]
                     sixth_action = actions[6]
+                    # Disconnecting the button from it's functionality
+                    sixth_action.triggered.disconnect()
+                    sixth_action.triggered.connect(self.custom_save_function)
                     zoom_in_icon = icon("fa.search-plus",
                                         color="white")
                     left_arrow_icon = icon("ei.arrow-left", color="white")
@@ -794,7 +803,7 @@ class File:
                     self.toolbar_1.insertAction(self.toolbar_1.actions()[4], zoom_out_button1)
                     for child in self.toolbar_1.findChildren(QtWidgets.QToolButton):
                         child.setStyleSheet("background-color: #849dad; ")
-                    self.Qwindow.tableWidget.show()
+                    # self.Qwindow.tableWidget.show()
                     self.Qwindow.pause_button.show()
                     self.Qwindow.rewind_button1.show()
                     self.Qwindow.verticalLayout_toolbar1.addWidget(self.toolbar_1)
@@ -892,10 +901,10 @@ class File:
                 self.ax2.legend()
                 if graph_ch2:
                     scene2 = QtWidgets.QGraphicsScene()
-                    canvas2 = FigureCanvasQTAgg(self.fig2)
+                    self.canvas2 = FigureCanvasQTAgg(self.fig2)
                     self.Qwindow.graphicsView_channel2.setScene(scene2)
-                    scene2.addWidget(canvas2)
-                    self.toolbar_2 = NavigationToolbar(canvas2, self.Qwindow)
+                    scene2.addWidget(self.canvas2)
+                    self.toolbar_2 = NavigationToolbar(self.canvas2, self.Qwindow)
                     # Remove the Home and Customize buttons from the toolbar
                     unwanted_buttons = ['Customize', 'Home', 'Subplots']
                     for x in self.toolbar_2.actions():
@@ -908,6 +917,9 @@ class File:
                     first_action = actions[1]
                     second_action = actions[3]
                     sixth_action = actions[6]
+                    sixth_action.triggered.disconnect()
+                    # Connect it to a custom function that handles saving
+                    sixth_action.triggered.connect(self.custom_save_function_channel2)
                     zoom_in_icon = icon("fa.search-plus",
                                         color="white")
                     left_arrow_icon = icon("ei.arrow-left", color="white")
@@ -926,10 +938,28 @@ class File:
                     self.toolbar_2.insertAction(self.toolbar_2.actions()[4], zoom_out_button2)
                     for child in self.toolbar_2.findChildren(QtWidgets.QToolButton):
                         child.setStyleSheet("background-color: #849dad;")
-                    self.Qwindow.tableWidget.show()
+                    # self.Qwindow.tableWidget.show()
                     self.Qwindow.pause_button_2.show()
                     self.Qwindow.rewind_button2.show()
                     self.Qwindow.verticalLayout_toolbar2.addWidget(self.toolbar_2)
+
+    def custom_save_function(self):
+        # A function to choose a specific folder to save the image in
+        file_path = f"screenshots/channel1no{self.img_channel1_counter}.png"
+        # Specify the frmat, e.g., "png"
+        format = "png"
+        # Save the figure to the specified path and format
+        self.canvas1.print_figure(file_path, format=format)
+        self.img_channel1_counter += 1
+
+    def custom_save_function_channel2(self):
+        file_path = f"screenshots/channel2no{self.img_channel2_counter}.png"
+        # Specify the frmat, e.g., "png"
+        format = "png"
+        # Save the figure to the specified path and format
+        self.canvas2.print_figure(file_path, format=format)
+        self.img_channel2_counter += 1
+
 
     def current_file_and_channel(self):
         return str(self.Qwindow.signals_name.currentText())
@@ -1006,11 +1036,6 @@ class File:
 
     def create_pdf_file(self):
         # Building the PDF
-        self.add_new_pdf_page()
-        self.doc.build(self.page_container)
-
-    def add_new_pdf_page(self):
-        # Adding a Header for the image section and styling it
         img_header = "Vital Signs Image"
         header_text_style = styles.getSampleStyleSheet()["Normal"]
         header_text_style.alignment = 1  # 1 represents center alignment
@@ -1019,26 +1044,62 @@ class File:
         paragraph = Paragraph(img_header, header_text_style)
         self.page_container.append(paragraph)
         self.page_container.append(Spacer(1, 0.5 * inch))
-        # Add an image to the PDF
-        pixmap = self.Dwindow.screenshot_section.pixmap()
-        # Convert QPixmap to PIL Image
-        image = QImage(pixmap)
-        # Specify a unique filename for each image
-        image_filename = f"temp_image_{self.pdf_counter}.png"
-        image.save(image_filename)
-        # Add the image to the PDF
-        pdf_image = Image(image_filename, width=8 * inch, height=4 * inch)
-        self.page_container.append(pdf_image)
-        self.page_container.append(Spacer(1, 1 * inch))
+        folder_path = "screenshots"
+        # List all files in the folder
+        image_files = glob.glob(os.path.join(folder_path, '*.png'))
+        file_names = [os.path.basename(path) for path in image_files]
+        # Read and process each image
+        for image_path in file_names:
+            pdf_image = Image(f"screenshots/{image_path}", width=8 * inch, height=4 * inch)
+            self.page_container.append(pdf_image)
+            self.page_container.append(PageBreak())
+            self.page_container.append(Spacer(1, 1 * inch))
         # Adding Header for the comment section and styling it
-        doctor_header = "Doctor Notes: "
+        table_header = "Signals Statistics Information: "
+        theader_text_style = styles.getSampleStyleSheet()["Normal"]
+        theader_text_style.alignment = 1  # 1 represents center alignment
+        theader_text_style.fontSize = 16  # Set font size to 12px
+        theader_text_style.fontWeight = 'bold'  # Set font size to 12px
+        paragraph = Paragraph(table_header, theader_text_style)
+        self.page_container.append(paragraph)
+        self.page_container.append(Spacer(1, 0.5 * inch))
+        # Adding Signals statistics
+        table_header = ["Name", "Mean", "Std", "Duration", "Min Value", "Max Value"]
+        self.statistics_data.append(table_header)
+        # Add the table data for each row
+        for i in range(self.row_counter):
+            row_data = [
+                self.Qwindow.tableWidget.item(i, 0).text(),
+                self.Qwindow.tableWidget.item(i, 1).text(),
+                self.Qwindow.tableWidget.item(i, 2).text(),
+                self.Qwindow.tableWidget.item(i, 3).text(),
+                self.Qwindow.tableWidget.item(i, 4).text(),
+                self.Qwindow.tableWidget.item(i, 5).text()
+            ]
+            self.statistics_data.append(row_data)
+        # Create the table and style
+        table = Table(self.statistics_data, colWidths=[1.5 * inch] * 6)
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ]))
+        self.page_container.append(table)
+        self.page_container.append(PageBreak())
+        # Adding Header for the comment section and styling it
+        doctor_header = "Doctor's Comments: "
         dheader_text_style = styles.getSampleStyleSheet()["Normal"]
-        dheader_text_style.alignment = 1  # 1 represents center alignment
+        # dheader_text_style.alignment = 1  # 1 represents center alignment
         dheader_text_style.fontSize = 16  # Set font size to 12px
         dheader_text_style.fontWeight = 'bold'  # Set font size to 12px
         paragraph = Paragraph(doctor_header, dheader_text_style)
         self.page_container.append(paragraph)
         self.page_container.append(Spacer(1, 0.5 * inch))
+
         # Add text to the PDF
         text = self.Dwindow.comment_section.text()
         text_style = styles.getSampleStyleSheet()["Normal"]
@@ -1046,13 +1107,26 @@ class File:
         text_style.fontSize = 14  # Set font size to 12px
         paragraph = Paragraph(text, text_style)
         self.page_container.append(paragraph)
-        # Creating a new PDF page
         self.pdf_counter += 1
-        self.page_container.append(PageBreak())
-        empty_pixmap = QPixmap()  # Create an empty QPixmap
-        self.Dwindow.screenshot_section.setPixmap(empty_pixmap)
         self.Dwindow.comment_section.setText("")
+        self.doc.build(self.page_container)
+        if os.path.exists(folder_path) and os.path.isdir(folder_path):
+            # List all files in the directory
+            files = os.listdir(folder_path)
+            # Loop through the files and delete only if they are image files (you can customize this check)
+            for file in files:
+                file_path = os.path.join(folder_path, file)
+                # You can customize this condition to check for specific image file extensions
+                if os.path.isfile(file_path):
+                    os.remove(file_path)
+                    print(f"Deleted {file_path}")
+            else:
+                print(f"The folder path {folder_path} does not exist or is not a directory.")
 
+    def add_new_pdf_page(self):
+        # Adding a Header for the image section and styling it
+        pass
+       
     def forward(self):
         return self.line
 
