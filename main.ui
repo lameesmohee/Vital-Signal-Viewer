@@ -560,7 +560,33 @@ color : white;
 background-color: black;
 gridline-color: white;
 }*/
-background-color:#F0F5F9</string>
+background-color: #F0F5F9;
+QMenu {
+background-color: red;
+ };
+
+QMenu::item {
+padding: 2px 20px 2px 20px;
+border: 1px solid transparent; 
+spacing: 20px;
+ };
+ 
+QMenu::item:selected {
+border-color: darkblue;
+background: rgb(255, 0, 0);
+color:white;
+ };
+ 
+QMenu::separator {
+     height: 2px;
+     margin: 2px 5px 2px 4px;
+ };
+ 
+QMenu::indicator {
+     width: 20px;
+     height: 13px;
+ };
+</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QComboBox" name="signals_name">
@@ -628,7 +654,7 @@ QComboBox::item:hover {
    <widget class="QPushButton" name="pushButton_plot">
     <property name="geometry">
      <rect>
-      <x>950</x>
+      <x>980</x>
       <y>10</y>
       <width>81</width>
       <height>31</height>
@@ -753,10 +779,10 @@ QPushButton:pressed {
    <widget class="QPushButton" name="minus_button">
     <property name="geometry">
      <rect>
-      <x>810</x>
-      <y>10</y>
-      <width>29</width>
-      <height>21</height>
+      <x>830</x>
+      <y>20</y>
+      <width>31</width>
+      <height>31</height>
      </rect>
     </property>
     <property name="font">
@@ -787,7 +813,7 @@ QPushButton:pressed {
 }</string>
     </property>
     <property name="text">
-     <string>➖</string>
+     <string/>
     </property>
     <property name="shortcut">
      <string>Ctrl+D</string>
@@ -796,10 +822,10 @@ QPushButton:pressed {
    <widget class="QPushButton" name="plus_button">
     <property name="geometry">
      <rect>
-      <x>770</x>
-      <y>10</y>
-      <width>29</width>
-      <height>21</height>
+      <x>790</x>
+      <y>20</y>
+      <width>31</width>
+      <height>31</height>
      </rect>
     </property>
     <property name="font">
@@ -830,7 +856,7 @@ QPushButton:pressed {
 }</string>
     </property>
     <property name="text">
-     <string>➕</string>
+     <string/>
     </property>
     <property name="iconSize">
      <size>
@@ -1023,8 +1049,8 @@ QTableWidget QHeaderView::section { text-align: center; }
    <widget class="QRadioButton" name="link_button">
     <property name="geometry">
      <rect>
-      <x>860</x>
-      <y>10</y>
+      <x>890</x>
+      <y>20</y>
       <width>61</width>
       <height>21</height>
      </rect>
@@ -1044,6 +1070,28 @@ color:#849dad;</string>
     </property>
     <property name="shortcut">
      <string>Ctrl+L</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>800</x>
+      <y>0</y>
+      <width>61</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: #849dad;</string>
+    </property>
+    <property name="text">
+     <string>SPEED</string>
     </property>
    </widget>
   </widget>

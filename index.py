@@ -149,7 +149,8 @@ class File:
         QCoreApplication.processEvents()
         self.Dwindow.save_button.clicked.connect(self.Dwindow.close)
         QCoreApplication.processEvents()
-
+        self.Qwindow.open_file.triggered.connect(self.change_background_color)
+        self.Qwindow.make_pdf.triggered.connect(self.change_background_color)
 
     def Ui_graph_channel2(self):   # Styling the UI of the 2nd graph
         self.fig2.set_facecolor('#F0F5F9')
@@ -229,14 +230,26 @@ class File:
                                                   "font-size: 16px")
         self.Qwindow.setFixedSize(1400, 1000)
         rewind_icon = icon("fa.backward", color='white')
+        plus_icon = icon("fa.plus", color='white')
+        minus_icon = icon("fa.minus", color='white')
+        self.Qwindow.plus_button.setIcon(plus_icon)
+        self.Qwindow.minus_button.setIcon(minus_icon)
         self.Qwindow.rewind_button1.setIcon(rewind_icon)
         self.Qwindow.rewind_button2.setIcon(rewind_icon)
         self.Qwindow.rewind_button1.setStyleSheet("background-color: #849dad;")
         self.Qwindow.rewind_button2.setStyleSheet("background-color: #849dad;")
+        self.Qwindow.menuFile.setStyleSheet("QMenu::item:selected {background:#708694;}");
+
         self.Qwindow.graphicsView_channel1.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.Qwindow.graphicsView_channel1.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.Qwindow.graphicsView_channel2.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.Qwindow.graphicsView_channel2.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+
+    def change_background_color(self):
+        # Change the background color when the QAction is triggered
+        action = self.Qwindow.menuFile.activeAction()
+        if action:
+            action.setBackgroundColor("red")
 
     def toggle_channel_animation(self, ani_num):
         if ani_num == None:
@@ -656,7 +669,7 @@ class File:
                         break
                     break
             # default limits
-            self.data_x_limits, self.data_y_limits = self.read_ecg_data_from_csv(r'C:\Users\delta\OneDrive\Desktop\deadline\task1-signal-viewer-dsp_fall23_task1_team_9\Vital-Signals\EMG_Dataset.csv')
+            self.data_x_limits, self.data_y_limits = self.read_ecg_data_from_csv('Vital-Signals\EMG_Dataset.csv')
             self.time_list, self.signal_values_list = self.read_ecg_data_from_csv(file_namee)
             return file_part, file_namee, channel1, channel2
 
