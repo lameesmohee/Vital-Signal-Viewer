@@ -90,6 +90,7 @@ class File:
         self.Dwindow = DocumentWindow()
         self.fig = plt.figure(figsize=(1450 / 80, 345 / 80), dpi=80)
         self.fig2 = plt.figure(figsize=(1450 / 80, 345 / 80), dpi=80)
+        self.previous_specific_row = 0
         self.mean = 0
         self.std = 0
         self.duration = 0
@@ -149,8 +150,8 @@ class File:
         QCoreApplication.processEvents()
         self.Dwindow.save_button.clicked.connect(self.Dwindow.close)
         QCoreApplication.processEvents()
-        self.Qwindow.open_file.triggered.connect(self.change_background_color)
-        self.Qwindow.make_pdf.triggered.connect(self.change_background_color)
+        self.Qwindow.Timer.timeout.connect(self.Pause_pan)
+        self.Qwindow.Timer.start(10)
 
     def Ui_graph_channel2(self):   # Styling the UI of the 2nd graph
         self.fig2.set_facecolor('#F0F5F9')
@@ -199,25 +200,6 @@ class File:
         return
 
     def styles(self):
-        for column in range(self.Qwindow.tableWidget.columnCount()):
-            self.Qwindow.tableWidget.setColumnWidth(column, 307)
-        header = self.Qwindow.tableWidget.horizontalHeader()
-        header.setMinimumHeight(40)
-        header_style = """
-                                QHeaderView::section {
-                                    background-color: #849dad; /* Change this to your desired color */
-                                    color: white; /* Text color */
-                                    font-weight: bold;
-                                    font-size: 16px
-                                }
-                            """
-        self.Qwindow.tableWidget.setStyleSheet("QTableWidget { font-size: 15px; font-weight: bold}"
-                                               "QTableWidget::item { text-align: center; }"
-                                               "QTableWidget QHeaderView::section { text-align: center; }")
-        self.Qwindow.tableWidget.horizontalHeader().setDefaultAlignment(QtCore.Qt.AlignHCenter)
-        self.Qwindow.tableWidget.verticalHeader().setDefaultAlignment(QtCore.Qt.AlignVCenter)
-        self.Qwindow.tableWidget.horizontalHeader().setStyleSheet(header_style)
-        self.Qwindow.tableWidget.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.Qwindow.pause_button.hide()
         self.Qwindow.pause_button_2.hide()
         self.Qwindow.rewind_button1.hide()
@@ -239,17 +221,10 @@ class File:
         self.Qwindow.rewind_button1.setStyleSheet("background-color: #849dad;")
         self.Qwindow.rewind_button2.setStyleSheet("background-color: #849dad;")
         self.Qwindow.menuFile.setStyleSheet("QMenu::item:selected {background:#708694;}");
-
         self.Qwindow.graphicsView_channel1.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.Qwindow.graphicsView_channel1.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.Qwindow.graphicsView_channel2.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.Qwindow.graphicsView_channel2.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-
-    def change_background_color(self):
-        # Change the background color when the QAction is triggered
-        action = self.Qwindow.menuFile.activeAction()
-        if action:
-            action.setBackgroundColor("red")
 
     def toggle_channel_animation(self, ani_num):
         if ani_num == None:
@@ -260,59 +235,126 @@ class File:
             msg.exec_()
             return
         if (ani_num == self.ani):
-
             if self.Qwindow.pause_button.text() == "►":
                 self.Qwindow.pause_button.setText("❚❚")
-                shortcut1 = QShortcut(QKeySequence('Ctrl+P'), self.Qwindow)
-                shortcut1.activated.connect(self.Qwindow.pause_button.click)
                 self.play_ch1 = True
                 self.ani.event_source.start()
-            else:
-                self.Qwindow.pause_button.setText("►")
                 shortcut1 = QShortcut(QKeySequence('Ctrl+P'), self.Qwindow)
                 shortcut1.activated.connect(self.Qwindow.pause_button.click)
+            else:
+                self.Qwindow.pause_button.setText("►")
                 self.play_ch1 = False
                 self.ani.event_source.stop()
+                shortcut1 = QShortcut(QKeySequence('Ctrl+P'), self.Qwindow)
+                shortcut1.activated.connect(self.Qwindow.pause_button.click)
         else:
             if self.Qwindow.pause_button_2.text() == "►":
                 self.Qwindow.pause_button_2.setText("❚❚")
                 shortcut2 = QShortcut(QKeySequence('Ctrl+B'), self.Qwindow)
                 shortcut2.activated.connect(self.Qwindow.pause_button_2.click)
                 self.play_ch2 = True
+                self.play_ch1= "None"
                 self.ani2.event_source.start()
             else:
                 self.Qwindow.pause_button_2.setText("►")
                 shortcut2 = QShortcut(QKeySequence('Ctrl+B'), self.Qwindow)
                 shortcut2.activated.connect(self.Qwindow.pause_button_2.click)
                 self.play_ch2 = False
+                self.play_ch1 = "None"
                 self.ani2.event_source.stop()
         if self.link:
-            if self.play_ch1:
+            if self.play_ch1 and self.play_ch1 != "None":
                 self.ani2.event_source.start()
-            elif not self.play_ch1:
+                self.Qwindow.pause_button_2.setText("❚❚")
+            elif not self.play_ch1 and self.play_ch1 != "None":
                 self.ani2.event_source.stop()
+                self.Qwindow.pause_button_2.setText("►")
             else:
                 if self.play_ch2:
                     self.ani.event_source.start()
+                    self.Qwindow.pause_button.setText("❚❚")
                 else:
                     self.ani.event_source.stop()
+                    self.Qwindow.pause_button.setText("►")
 
     def Zoom_out_channel1(self):
         y_min, y_max = self.ax.get_ylim()
         y_min -= 0.01
         y_max += 0.01
         self.ax.set_ylim(y_min, y_max)
+        # canvas refers to the area where the figure and its subplots are drawn
+        self.fig.canvas.draw()
 
     def Zoom_out_channel2(self):
         y_min, y_max = self.ax2.get_ylim()
         y_min -= 0.01
         y_max += 0.01
         self.ax2.set_ylim(y_min, y_max)
+        self.fig2.canvas.draw()
+
+    def Pause_pan(self):
+        if self.ax.get_navigate_mode() == "PAN" and not self.play_ch1 and not self.link:
+            x_min, x_max = self.ax.get_xlim()
+            for item in self.dic_channel1.items():
+                print(f"ite:{item[0]}")
+                if x_min < item[1][0][1] and item[0] == 0:
+                    new_x_min = item[1][0][1]
+                    print(x_min)
+                    print(f"new:{new_x_min}")
+                    self.ax.set_xlim(new_x_min, item[1][0][5])
+                    break
+        if self.ax.get_navigate_mode() == "PAN" and not self.play_ch1 and not self.link:
+            for item in self.dic_channel1.items():
+                if x_max > item[1][0][self.specific_row] and item[0] == 0:
+                    new_x_max = item[1][0][self.specific_row]
+                    self.ax.set_xlim(item[1][0][self.specific_row - 28], new_x_max)
+                    break
+        if self.ax.get_navigate_mode() == "PAN" and not self.play_ch1 and self.link:
+            if x_min < self.data_x_limits[1]:
+                new_x_min = self.data_x_limits[1]
+                print(x_min)
+                print(f"new:{new_x_min}")
+                self.ax.set_xlim(new_x_min, self.data_x_limits[5])
+            if x_max > self.data_x_limits[self.specific_row]:
+                    new_x_max = self.data_x_limits[self.specific_row]
+                    self.ax.set_xlim(self.data_x_limits[self.specific_row - 28], new_x_max)
+
+        if not self.play_ch1 and self.rewind_ch1:
+            for item in self.dic_channel1.items():
+                print(self.last_value)
+                print(self.begin_value)
+                print(self.x_fig1[item[0]])
+                self.ax.plot(self.x_fig1[item[0]], self.y_fig1[item[0]], color=self.colors_channel1[item[0]])
+                self.ax.set_xlim(item[1][0][self.begin_value], item[1][0][self.last_value])
+                self.fig.canvas.draw()
+                break
+        if self.ax2.get_navigate_mode() == "PAN" and not self.play_ch2:
+            x_min, x_max = self.ax2.get_xlim()
+            for item in self.dic_channel2.items():
+                if x_min < item[1][0][1] and item[0] == 0:
+                    new_x_min = item[1][0][1]
+                    self.ax2.set_xlim(new_x_min, item[1][0][5])
+                    break
+            for item in self.dic_channel2.items():
+                if x_max > item[1][0][self.specific_row_2] and item[0] == 0:
+                    new_x_max = item[1][0][self.specific_row_2]
+                    self.ax.set_xlim(item[1][0][self.specific_row_2 - 28], new_x_max)
+                    break
+        if not self.play_ch2 and self.rewind_ch2:
+            for item in self.dic_channel2.items():
+                print(self.last_value_2)
+                print(self.begin_value_2)
+                print(self.x_fig2[item[0]])
+                self.ax2.plot(self.x_fig2[item[0]], self.y_fig2[item[0]], color=self.colors_channel2[item[0]])
+                self.ax2.set_xlim(item[1][0][self.begin_value_2], item[1][0][self.last_value_2])
+                self.fig2.canvas.draw()
+                break
 
     def link_two_graphs(self):  # to link two graphs
         if self.Qwindow.link_button.isChecked():
             self.link = True
-            x_limits = (floor((min(self.data_x_limits)) - 0.05), ceil(max(self.data_x_limits) + 0.01))  # Normalize limits
+            # Normalize limits
+            x_limits = (floor((min(self.data_x_limits)) - 0.05), ceil(max(self.data_x_limits) + 0.01))
             y_limits = (floor((min(self.data_y_limits)) - 0.05), ceil(max(self.data_y_limits) + 0.01))
             # same time frames
             self.ax.set_xlim(x_limits)
@@ -338,6 +380,7 @@ class File:
             print(len(self.present_line2))
             # present line => lines except first one to begin other lines from the last time which first line is drawn
             # check if line in present lines or not
+            # present_line2 contains the signals that are in the second port
             if idx_line_ch2[0] != 0 and idx_line_ch2[0] in self.present_line2.keys():
                 print(len(self.present_line2))
                 for idx_line2 in self.present_line2.items():
@@ -359,6 +402,11 @@ class File:
                 self.y_fig2[idx_line_ch2[0]].append(idx_line_ch2[1][1][self.specific_row_2])
                 print(self.x_fig2[idx_line_ch2[0]])
                 self.lines2[idx_line_ch2[0]].set_data(self.x_fig2[idx_line_ch2[0]], self.y_fig2[idx_line_ch2[0]])
+                if self.current_data_2 == 2:
+                    self.ax2.set_xlim(idx_line_ch2[1][0][self.current_data_2 - 10],
+                                      idx_line_ch2[1][0][self.current_data_2])
+                    self.specific_row_2 = 31
+                    self.current_data_2 = 31
             if self.link:  # check if two graphs liked or not
                 if self.current_data_2 > 30 and found:  # update limits
                     # self.current_data = self.specific_row - current_idx
@@ -412,6 +460,11 @@ class File:
                 self.y_fig1[idx_line_ch1[0]].append(idx_line_ch1[1][1][self.specific_row])
                 print(self.x_fig1[idx_line_ch1[0]])
                 self.lines1[idx_line_ch1[0]].set_data(self.x_fig1[idx_line_ch1[0]], self.y_fig1[idx_line_ch1[0]])
+                if self.current_data == 2:
+                    self.ax.set_xlim(idx_line_ch1[1][0][self.current_data - 10], idx_line_ch1[1][0][self.current_data])
+                    self.specific_row = 31
+                    self.current_data = 31
+
             if self.link:  # check if two graphs liked or not
                 if self.current_data > 30 and found1:
                     # self.current_data = self.specific_row - current_idx
@@ -438,7 +491,6 @@ class File:
             msg.setInformativeText("Please Upload A Signal")
             msg.show()
             msg.exec_()
-
         else:
             # global ani
             self.delay_interval = 40
@@ -483,7 +535,7 @@ class File:
                 msg.show()
                 msg.exec_()
 
-    def rewind_channel1(self):  ## rewiind channels 30 points as 30 milisecond (ms) for channel1
+    def rewind_channel1(self):  # rewind channels 30 points as 30 millisecond (ms) for channel1
         if self.specific_row >= 62:
             return_value = 31
             self.begin_value = self.specific_row - 2 * 31
@@ -497,39 +549,30 @@ class File:
                 return_value = self.specific_row
                 self.begin_value = 0
 
-        self.specific_row -= return_value  ## return points 30 point
+        self.specific_row -= return_value  # return points 30 point
         self.last_value = self.specific_row
         listx_1 = []
         listy_1 = []
         listx_11 = []
         listy_11 = []
-        ## clear previous data
+        # clear previous data
         self.x_fig1.clear()
         self.y_fig1.clear()
         for item in self.dic_channel1.items():
             print(item[0])
             self.x_fig1[item[0]] = []
             self.y_fig1[item[0]] = []
-
-            ## store previous data which I can see when I rewind
+            # store previous data which I can see when I rewind
             if item[0] not in self.present_line1.keys():
                 print("hallo")
                 print(listx_11)
-                # print(item[1][0])
                 print(item[1][0][self.begin_value])
                 print(item[1][0][self.last_value])
-
                 listx_11 = item[1][0][self.begin_value: self.last_value]
                 listy_11 = item[1][1][self.begin_value: self.last_value]
-
                 for idx in range(len(listx_11)):
                     self.x_fig1[item[0]].append(listx_11[idx])
                     self.y_fig1[item[0]].append(listy_11[idx])
-
-
-
-
-
             else:
                 print(len(item[1][0]))
                 for data in range(len(item[1][0])):
@@ -542,37 +585,27 @@ class File:
                 for idx in range(len(listx_1)):
                     self.x_fig1[item[0]].append(listx_1[idx])
                     self.y_fig1[item[0]].append(listy_1[idx])
-
-                print("hallo")
                 print(self.present_line1[item[0]])
                 self.present_line1[item[0]] -= 31
-
         self.rewind_ch1 = True
 
     def rewind_channel2(self):
-
         if self.specific_row_2 >= 62:
             return_value_2 = 31
             self.begin_value_2 = self.specific_row_2 - 2 * 31
-
         else:
             if self.specific_row_2 >= 31:
                 return_value_2 = 31
                 self.begin_value_2 = 0
-
             else:
                 return_value_2 = self.specific_row_2
                 self.begin_value_2 = 0
-
-        self.specific_row_2 -= return_value_2  ## return points 30 point
+        self.specific_row_2 -= return_value_2  # return points 30 point
         self.last_value_2 = self.specific_row_2
-
         listx_2 = []
         listy_2 = []
         listx_22 = []
         listy_22 = []
-        # self.frames_channel1 += 30
-        # self.ani.event_source.stop()
         self.x_fig2.clear()
         self.y_fig2.clear()
         for item in self.dic_channel2.items():
@@ -586,7 +619,6 @@ class File:
                 for idx in range(len(listx_22)):
                     self.x_fig2[item[0]].append(listx_22[idx])
                     self.y_fig2[item[0]].append(listy_22[idx])
-
             else:
                 print(len(item[1][0]))
                 for data in range(len(item[1][0])):
@@ -618,12 +650,13 @@ class File:
         else:
             return ["None", "None"]
 
-
-
-
     def channels_checked(self):  # fun return which channel and path of file which selected
         check_list = self.Ischecked()
         file_namee, channel1, channel2 = self.current_file_and_channel(), check_list[0], check_list[1]
+        file_part = file_namee.split('/')[-1].split('.')[0]
+        if channel1 == "None" and channel2 == 'None' and file_part not in self.visited_channel1:
+            channel1 = "channel1"
+            self.Qwindow.checkBox_2.setChecked(True)
         print(file_namee)
         print(channel1)
         print(channel2)
@@ -673,8 +706,6 @@ class File:
             self.time_list, self.signal_values_list = self.read_ecg_data_from_csv(file_namee)
             return file_part, file_namee, channel1, channel2
 
-
-
     def Plot(self):  # plot animation
         file_part, file_namee, channel1, channel2 = self.channels_checked()
         # get range of data of signal
@@ -693,11 +724,9 @@ class File:
             self.visited_channel1 = [file for idx, file in enumerate(self.visited_channel1) if file != file_part]
             print("hallo")
             print(len(self.visited_channel1))
-
             if len(self.visited_channel1) == 0:
                 self.specific_row = 0
                 self.frames_channel1 += 300
-
             for item in self.hidden_line_ch1.items():
                 if item[0] == file_part:
                     self.hidden_idx_1 = item[1]
@@ -713,9 +742,6 @@ class File:
                 self.lines1[idx_line_ch1[0]], = self.ax.plot([], [], label=self.name_files_ch1[idx_line_ch1[0]],
                                                              color=self.colors_channel1[idx_line_ch1[0]])
             self.ax.legend()
-
-
-
         # Channel 1 /graph 1
         if channel1 == "channel1":
             for item in count_files_channel1.items():  # get no of repeateed signal
@@ -751,9 +777,9 @@ class File:
                     graph_ch1 = False
                 for index in range(self.previous_line1, self.no_of_line):  # store lines of graph1
                     self.hidden_line_ch1[file_part] = index
-                    self.files_index_ch1[index]=file_part
+                    self.files_index_ch1[index] = file_part
                     self.lines1[index], = self.ax.plot([], [], label=file_part, color=self.signal_color)
-                    self.colors_channel1[index]=self.signal_color
+                    self.colors_channel1[index] = self.signal_color
                     self.x_fig1[index] = []
                     self.y_fig1[index] = []
                 # to add another lines and begin  from last time of first line
@@ -811,17 +837,14 @@ class File:
                     second_action.setIcon(pan_icon)
                     sixth_action.setIcon(screenshot_icon)
                     zoom_out_icon = icon("fa.search-minus", color="white")
-                    zoom_out_button1 = QtWidgets.QAction(zoom_out_icon, "Zoom Out", self.Qwindow)
-                    zoom_out_button1.triggered.connect(self.Zoom_out_channel1)
-                    self.toolbar_1.insertAction(self.toolbar_1.actions()[4], zoom_out_button1)
+                    self.zoom_out_button1 = QtWidgets.QAction(zoom_out_icon, "Zoom Out", self.Qwindow)
+                    self.zoom_out_button1.triggered.connect(self.Zoom_out_channel1)
+                    self.toolbar_1.insertAction(self.toolbar_1.actions()[4], self.zoom_out_button1)
                     for child in self.toolbar_1.findChildren(QtWidgets.QToolButton):
                         child.setStyleSheet("background-color: #849dad; ")
-                    # self.Qwindow.tableWidget.show()
                     self.Qwindow.pause_button.show()
                     self.Qwindow.rewind_button1.show()
                     self.Qwindow.verticalLayout_toolbar1.addWidget(self.toolbar_1)
-
-
 
         # channel2 /graph 2
         if channel2 == "None" and file_part in self.visited_channel2:
@@ -844,7 +867,7 @@ class File:
             self.lines2[self.hidden_idx_2] = "None"
             print(self.lines2)
             print(self.present_line2.keys())
-            if  self.hidden_idx_2 in self.present_line2.keys():
+            if self.hidden_idx_2 in self.present_line2.keys():
                 del self.present_line2[self.hidden_idx_2]
             self.fig2.clf()
             self.Ui_graph_channel2()
@@ -946,12 +969,11 @@ class File:
                     sixth_action.setIcon(screenshot_icon)
                     # Creating an Icon for the Zoom Out button and Creating the button Itself
                     zoom_out_icon = icon("fa.search-minus", color="white")
-                    zoom_out_button2 = QtWidgets.QAction(zoom_out_icon, "Zoom Out", self.Qwindow)
-                    zoom_out_button2.triggered.connect(self.Zoom_out_channel2)
-                    self.toolbar_2.insertAction(self.toolbar_2.actions()[4], zoom_out_button2)
+                    self.zoom_out_button2 = QtWidgets.QAction(zoom_out_icon, "Zoom Out", self.Qwindow)
+                    self.zoom_out_button2.triggered.connect(self.Zoom_out_channel2)
+                    self.toolbar_2.insertAction(self.toolbar_2.actions()[4], self.zoom_out_button2)
                     for child in self.toolbar_2.findChildren(QtWidgets.QToolButton):
                         child.setStyleSheet("background-color: #849dad;")
-                    # self.Qwindow.tableWidget.show()
                     self.Qwindow.pause_button_2.show()
                     self.Qwindow.rewind_button2.show()
                     self.Qwindow.verticalLayout_toolbar2.addWidget(self.toolbar_2)
@@ -972,7 +994,6 @@ class File:
         # Save the figure to the specified path and format
         self.canvas2.print_figure(file_path, format=format)
         self.img_channel2_counter += 1
-
 
     def current_file_and_channel(self):
         return str(self.Qwindow.signals_name.currentText())
@@ -1006,11 +1027,11 @@ class File:
             self.duration = self.Qwindow.calc_duration(self.time_list)
             self.min_value, self.max_value = self.Qwindow.calc_min_max_values(self.signal_values_list)
             self.Qwindow.tableWidget.setItem(self.row_counter - 1, 0, QTableWidgetItem(self.line))
-            self.Qwindow.tableWidget.setItem(self.row_counter - 1, 1, QTableWidgetItem(str(round(self.mean, 8))))
-            self.Qwindow.tableWidget.setItem(self.row_counter - 1, 2, QTableWidgetItem(str(round(self.std, 8))))
-            self.Qwindow.tableWidget.setItem(self.row_counter - 1, 3, QTableWidgetItem(str(self.duration)))
-            self.Qwindow.tableWidget.setItem(self.row_counter - 1, 4, QTableWidgetItem(str(self.min_value)))
-            self.Qwindow.tableWidget.setItem(self.row_counter - 1, 5, QTableWidgetItem(str(self.max_value)))
+            self.Qwindow.tableWidget.setItem(self.row_counter - 1, 1, QTableWidgetItem(str(round(self.mean, 3))))
+            self.Qwindow.tableWidget.setItem(self.row_counter - 1, 2, QTableWidgetItem(str(round(self.std, 3))))
+            self.Qwindow.tableWidget.setItem(self.row_counter - 1, 3, QTableWidgetItem(str(round(self.duration, 3))))
+            self.Qwindow.tableWidget.setItem(self.row_counter - 1, 4, QTableWidgetItem(str(round(self.min_value, 3))))
+            self.Qwindow.tableWidget.setItem(self.row_counter - 1, 5, QTableWidgetItem(str(round(self.max_value, 3))))
 
     def read_ecg_data_from_csv(self, file_name):
         try:
@@ -1114,7 +1135,7 @@ class File:
         self.page_container.append(Spacer(1, 0.5 * inch))
 
         # Add text to the PDF
-        text = self.Dwindow.comment_section.text()
+        text = self.Dwindow.comment_section.toPlainText()
         text_style = styles.getSampleStyleSheet()["Normal"]
         text_style.alignment = 1  # 1 represents center alignment
         text_style.fontSize = 14  # Set font size to 12px
@@ -1148,6 +1169,7 @@ class MainApp(QMainWindow, MainUI):
     def __init__(self, parent=None):
         super(MainApp, self).__init__(parent)
         QMainWindow.__init__(self)
+        self.Timer = QTimer(self)
         self.setupUi(self)
         self.setWindowTitle("Signal Real-Time Monitoring")
 
@@ -1173,6 +1195,7 @@ class DocumentWindow(QMainWindow, DocumentWindowUI):
         super(DocumentWindow, self).__init__(parent)
         QMainWindow.__init__(self)
         self.setupUi(self)
+
         self.setWindowTitle("Create A PDF")
 
 
