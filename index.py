@@ -1,10 +1,13 @@
+import os
+from reportlab.platypus import SimpleDocTemplate, PageBreak, Spacer, Paragraph, Table, TableStyle
+from reportlab.lib import colors
 import matplotlib
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Image, PageBreak
 from reportlab.lib.units import inch
+import glob
 from PIL import Image as PILImage
 from reportlab.platypus.doctemplate import Spacer
 from reportlab.lib import styles
-
 matplotlib.use('Qt5Agg')
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWidgets import *
@@ -19,7 +22,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from math import ceil, floor
 from collections import Counter
-
 plt.style.use('ggplot')
 from matplotlib.animation import FuncAnimation
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg, NavigationToolbar2QT as NavigationToolbar
@@ -33,6 +35,7 @@ DocumentWindowUI, _ = loadUiType(path.join(path.dirname(__file__), 'DocumentWind
 
 class File:
     def __init__(self):
+        # self.child_item = None
         self.ani_list = []
         self.ani = None
         self.ani2 = None
@@ -108,10 +111,18 @@ class File:
         self.margin = 0
         self.page_container = []
         self.Time = np.linspace(0, 2, 600)
-
         self.pdf_filename = f"Medical Report {self.pdf_counter}.pdf"
         self.doc = SimpleDocTemplate(self.pdf_filename, pagesize=letter)
         self.Qwindow.tableWidget.hide()
+        self.tree_port1 = QTreeWidgetItem(self.Qwindow.info_container, ["Port 1"])
+        font = QFont()
+        font.setPointSize(16)
+        self.tree_port1.setFont(0, font)
+        self.tree_port2 = QTreeWidgetItem(self.Qwindow.info_container, ["Port 2"])
+        self.tree_port2.setFont(0, font)
+        self.Qwindow.info_container.addTopLevelItem(self.tree_port1)
+        self.Qwindow.info_container.addTopLevelItem(self.tree_port2)
+        self.Qwindow.child_item = QTreeWidgetItem(self.tree_port1)
 
     def handle_button_push(self):
         self.Qwindow.open_file.triggered.connect(self.browse_file)
@@ -140,13 +151,8 @@ class File:
         QCoreApplication.processEvents()
         self.Qwindow.make_pdf.triggered.connect(self.open_window)
         QCoreApplication.processEvents()
-        # self.Dwindow.add_image_button.clicked.connect(self.load_image)
-        QCoreApplication.processEvents()
-        # self.Dwindow.save_button.clicked.connect(self.create_pdf_file)
-        QCoreApplication.processEvents()
         self.Dwindow.save_button.clicked.connect(self.Dwindow.close)
         QCoreApplication.processEvents()
-        self.Dwindow.add_new_page_button.clicked.connect(self.add_new_pdf_page)
         self.Qwindow.Timer.timeout.connect(self.Pause_pan)
         self.Qwindow.Timer.start(40)
         shortcut2 = QShortcut(QKeySequence('Ctrl+P'), self.Qwindow)
@@ -154,8 +160,10 @@ class File:
         shortcut1 = QShortcut(QKeySequence('Ctrl+S'), self.Qwindow)
         shortcut1.activated.connect(self.Qwindow.pause_button.click)
 
-    def Ui_graph_channel2(self):  # Styling the UI of the 2nd graph
+        # self.Qwindow.child_item.setContextMenuPolicy(Qt.CustomContextMenu)
+        # self.Qwindow.child_item.customContextMenuRequested.connect(self.Qwindow.showContextMenu)
 
+    def Ui_graph_channel2(self):  # Styling the UI of the 2nd graph
         self.fig2.set_facecolor('#F0F5F9')
         self.ax2 = self.fig2.add_subplot(111)
         self.ax2.set_facecolor('#F0F5F9')
@@ -179,7 +187,6 @@ class File:
         self.ax2.set_ylabel("Vital Signal")
 
     def Ui_graph_channel1(self):  # Styling the UI for the 1st Graph
-
         self.fig.set_facecolor('#F0F5F9')
         self.ax = self.fig.add_subplot(111)
         left_margin = 0.1  # Adjust this value as needed
@@ -273,16 +280,6 @@ class File:
                     self.ax.set_xlim(self.Time[self.specific_row - 28], new_x_max)
                     break
 
-        # if self.ax.get_navigate_mode() == "PAN" and not self.play_ch1 and self.link:
-        #     if x_min < self.data_x_limits[1]:
-        #         new_x_min = self.data_x_limits[1]
-        #         print(x_min)
-        #         print(f"new:{new_x_min}")
-        #         self.ax.set_xlim(new_x_min, self.data_x_limits[5])
-        #     if x_max > self.data_x_limits[self.specific_row]:
-        #         new_x_max = self.data_x_limits[self.specific_row]
-        #         self.ax.set_xlim(self.data_x_limits[self.specific_row - 28], new_x_max)
-
         if not self.play_ch1 and self.rewind_ch1:
             for item in self.dic_channel1.items():
                 print(self.x_fig1[item[0]])
@@ -291,7 +288,7 @@ class File:
                 self.fig.canvas.draw()
                 break
 
-        ## channel2
+        # channel2
         if self.ax2.get_navigate_mode() == "PAN" and self.play_ch2:
             y_min, y_max = self.ax2.get_ylim()
 
@@ -318,16 +315,6 @@ class File:
                     self.ax2.set_xlim(self.Time[self.specific_row_2 - 28], new_x_max)
                     break
 
-        # if self.ax2.get_navigate_mode() == "PAN" and not self.play_ch2 and self.link:
-        #     if x_min < self.data_x_limits[1]:
-        #         new_x_min = self.data_x_limits[1]
-        #         print(x_min)
-        #         print(f"new:{new_x_min}")
-        #         self.ax2.set_xlim(new_x_min, self.data_x_limits[5])
-        #     if x_max > self.data_x_limits[self.specific_row_2]:
-        #         new_x_max = self.data_x_limits[self.specific_row]
-        #         self.ax2.set_xlim(self.data_x_limits[self.specific_row_2 - 28], new_x_max)
-
         if not self.play_ch2 and self.rewind_ch2:
             for item in self.dic_channel2.items():
                 print(self.x_fig2[item[0]])
@@ -337,14 +324,14 @@ class File:
                 break
 
     def toggle_channel_animation(self, ani_num):
-        if ani_num == None:
+        if ani_num is None:
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Warning)
             msg.setInformativeText("No animations to toggle.")
             msg.show()
             msg.exec_()
             return
-        if (ani_num == self.ani):
+        if ani_num == self.ani:
             if self.Qwindow.pause_button.text() == "►":
                 self.Qwindow.pause_button.setText("❚❚")
                 self.play_ch1 = True
@@ -405,23 +392,11 @@ class File:
     def link_two_graphs(self):  # to link two graphs
         if self.Qwindow.link_button.isChecked():
             self.link = True
-
-            # x_limits = (floor((min(self.data_x_limits)) - 0.05), ceil(max(self.data_x_limits) + 0.01))  # Normalize limits
-            # y_limits = (floor((min(self.data_y_limits)) - 0.05), ceil(max(self.data_y_limits) + 0.01))
             # same time frames
             self.ax.set_xlim(0, 2)
             self.ax2.set_xlim(0, 2)
             self.ax.set_ylim(-1, 1)
             self.ax2.set_ylim(-1, 1)
-
-            # for item in self.dic_channel2.items():
-            #     for idx in range(len(item[1][0])):  ## dic={key: valuse } ,# {0:[[x_axis],[y-axis]]} ,{(0,[[x_axis],[y_axis]])}
-            #         if item[1][0][idx] > self.data_x_limits[self.specific_row + 1]:
-            #             self.specific_row_2 = idx
-            #             break
-            #     break
-
-
         else:
             self.link = False
 
@@ -445,15 +420,13 @@ class File:
             print(len(self.present_line2))
             # present line => lines except first one to begin other lines from the last time which first line is drawn
             # check if line in present lines or not
-            if idx_line_ch2[0] in self.present_line2.keys():  # prewsentline = {index_line: current data(index)}
+            if idx_line_ch2[0] in self.present_line2.keys():  # presentline = {index_line: current data(index)}
                 print(len(self.present_line2))
                 for idx_line2 in self.present_line2.items():
                     if idx_line2[0] == idx_line_ch2[0]:
                         print(f"l:{idx_line2[1]}")
                         current_idx_2 = idx_line2[1]
                         # append data to update graph2
-                        # self.x_fig2[idx_line_ch2[0]].append(idx_line_ch2[1][0][self.specific_row_2 -
-                        #                                                        (current_idx_2 + 1)])
                         self.y_fig2[idx_line_ch2[0]].append(idx_line_ch2[1][self.specific_row_2 -
                                                                             (current_idx_2 + 1)])
                         print(f"line2:{self.x_fig2[idx_line_ch2[0]]}")
@@ -516,24 +489,18 @@ class File:
                         current_idx = idx_line1[1] + 1
                         self.x_fig1[idx_line_ch1[0]].append(self.Time[self.specific_row])
                         # append data to update graph1
-                        # self.x_fig1[idx_line_ch1[0]].append(idx_line_ch1[1][0][self.specific_row - current_idx])
                         self.y_fig1[idx_line_ch1[0]].append(idx_line_ch1[1][self.specific_row - current_idx])
                         print(f"line2:{self.x_fig1[idx_line_ch1[0]]}")
                         self.lines1[idx_line_ch1[0]].set_data(self.x_fig1[idx_line_ch1[0]],
                                                               self.y_fig1[idx_line_ch1[0]])
                         self.current_data = self.specific_row - current_idx
             else:
-                # self.y_fig1[idx_line_ch1[0]] = []
                 # append data to update graph1 to first line
                 self.y_fig1[idx_line_ch1[0]].append(idx_line_ch1[1][self.specific_row])
                 self.x_fig1[idx_line_ch1[0]].append(self.Time[self.specific_row])
                 print(f"x_data:{self.x_fig1[idx_line_ch1[0]]}")
                 print(f"time:{self.y_fig1[idx_line_ch1[0]]}")
                 self.lines1[idx_line_ch1[0]].set_data(self.x_fig1[idx_line_ch1[0]], self.y_fig1[idx_line_ch1[0]])
-
-                # if self.current_data == 2:  # update limits
-                #     self.specific_row = 31
-                #     self.current_data = 31
 
             if self.link:  # check if two graphs linked or not
 
@@ -608,7 +575,7 @@ class File:
                 msg.show()
                 msg.exec_()
 
-    def rewind_channel1(self):  ## rewiind channels 30 points as 30 milisecond (ms) for channel1
+    def rewind_channel1(self):  # rewind channels 30 points as 30 milisecond (ms) for channel1
 
         x_min = self.ax.get_xlim()
         self.rewind_ch1 = True
@@ -623,40 +590,32 @@ class File:
         for item in self.dic_channel1.items():
             print(item[0])
 
-            ## store previous data which I can see when I rewind
-            if item[0] not in self.present_line1.keys():  ## first signal
+            # store previous data which I can see when I rewind
+            if item[0] not in self.present_line1.keys():  # first signal
                 self.x_fig1[item[0]] = []
                 self.y_fig1[item[0]] = []
 
                 if self.specific_row > 60:
                     print("kskl")
                     self.begin_value = self.specific_row - 60
-
                     self.specific_row -= 30
                     print(f"sss:{self.specific_row}")
-
                 else:
                     if self.specific_row > 30:
                         self.begin_value = 0
                         self.specific_row = 30
-
                     else:
                         self.begin_value = 0
                         self.specific_row = self.specific_row
-
                 listx_11 = self.Time[self.begin_value: self.specific_row]
                 print(f"list:{listx_11}")
                 listy_11 = item[1][self.begin_value: self.specific_row]
-
                 for idx in range(len(listx_11)):
                     self.x_fig1[item[0]].append(listx_11[idx])
                     self.y_fig1[item[0]].append(listy_11[idx])
-
-
-            else:  ## second signal
+            else:  # second signal
                 self.x_fig1[item[0]] = []
                 self.y_fig1[item[0]] = []
-
                 for data in self.present_line1.items():
                     print(f"ii:{data[0]}")
                     print(f"ii:{data[1]}")
@@ -681,7 +640,6 @@ class File:
         print(f"spe:{self.specific_row}")
 
     def rewind_channel2(self):
-
         self.rewind_ch2 = True
 
         listx_2 = []
@@ -693,9 +651,8 @@ class File:
 
         for item in self.dic_channel2.items():
             print(item[0])
-
-            ## store previous data which I can see when I rewind
-            if item[0] not in self.present_line2.keys():  ## first signal
+            # store previous data which I can see when I rewind
+            if item[0] not in self.present_line2.keys():  # first signal
                 self.x_fig1[item[0]] = []
                 self.y_fig1[item[0]] = []
 
@@ -724,7 +681,7 @@ class File:
                     self.y_fig1[item[0]].append(listy_22[idx])
 
 
-            else:  ## second signal
+            else:  # second signal
                 self.x_fig2[item[0]] = []
                 self.y_fig2[item[0]] = []
 
@@ -820,7 +777,6 @@ class File:
                         break
                     break
             # default limits TO link
-            # self.data_x_limits, self.data_y_limits = self.read_ecg_data_from_csv('C:/Users/lama zakaria/Desktop/Vital-Signal-Viewer/Vital-Signals/EMG_Dataset.csv')
             self.signal_values_list = self.read_ecg_data_from_csv(file_namee)
             return file_part, file_namee, channel1, channel2
 
@@ -829,9 +785,7 @@ class File:
         # get range of data of signal
         self.ax.set_xlim(0, 2)
         data_y = self.signal_values_list
-        # x_range = (floor(min(data_x)-0.05), ceil(max(data_x)+0.01))
-        # self.ax.set_xbound(floor(min(data_x)-0.05), ceil(max(data_x)+0.01))
-        #
+
         # print(f"x_range:{x_range}")
         y_range = (floor(min(data_y)), ceil(max(data_y)))
 
@@ -841,7 +795,7 @@ class File:
         count_files_channel2 = Counter(self.visited_channel2)  # {key:value}
         # hide channels
         print(self.visited_channel1)
-        if channel1 == "None" and file_part in self.visited_channel1:  ## filepart: name of signal
+        if channel1 == "None" and file_part in self.visited_channel1:  ##filepart: name of signal
             print(self.visited_channel1)
             self.visited_channel1 = [file for idx, file in enumerate(self.visited_channel1) if file != file_part]
             print("hallo")
@@ -880,18 +834,8 @@ class File:
                     if file_part == value:
                         self.specific_row_2 = self.specific_row - 1
                         break
-                        # if key in self.present_line1.keys():
-                        #     data_x = self.ax.get_xlim()
-                        #     last_time = max(data_x)
-                        #     for idx in range(len(self.dic_channel1[key][0])):
-                        #         if last_time < self.dic_channel1[key][0][idx]:
-                        #             print(f"last:{self.dic_channel1[key][0][idx]}")
-                        #             self.specific_row_2 = idx + 5
-                        #             break
-                        # else:
-                        #     self.specific_row_2 = self.specific_row - 1
-                        #     break
-            ## show line
+
+            # show line
             if no_of_repeated == 1:
                 self.previous_line1 = self.no_of_line
                 self.no_of_line += 1  # every line take number which is key to access line
@@ -913,21 +857,9 @@ class File:
                     self.y_fig1[index] = []
                 # to add another /signals and begin  from last time of first line
                 if self.no_of_line > 1 and len(self.visited_channel1) != 1:
-                    # self.data_xline, self.data_yline = self.read_ecg_data_from_csv(file_namee)
+
                     self.present_line1[self.no_of_line - 1] = self.current_data
-                #     for key in self.dic_channel1.items():
-                #         print(key[1][0][self.current_data])
-                #         begin_idx_ch1 = key[1][0][self.current_data]
-                #         break
-                #     for idx in range(len(self.data_xline)):  # get index of first line to start from it
-                #         if self.data_xline[idx] >= begin_idx_ch1:
-                #             self.line_idx_ch1[self.no_of_line - 1] = idx
-                #             self.data_xline = self.data_xline[idx:]
-                #             self.data_yline = self.data_yline[idx:]
-                #             print(f"len_x:{len(self.data_xline)}")
-                #             break
-                #     self.dic_channel1[self.no_of_line - 1] = self.data_xline, self.data_yline  # add data to line
-                # else:
+
                 self.dic_channel1[self.no_of_line - 1] = self.read_ecg_data_from_csv(file_namee)
                 if graph_ch1:  # create animation
                     self.ani = FuncAnimation(self.fig, self.animate_fig1, interval=200,
@@ -1012,15 +944,6 @@ class File:
                     if file_part == value:
                         self.specific_row = self.specific_row_2 - 1
                         break
-                        # if key in self.present_line2.keys():
-                        #     data_x = self.ax2.get_xlim()
-                        #     last_time = max(data_x)
-                        #     for idx in range(len(self.dic_channel2[key][0])):
-                        #         if last_time < self.dic_channel2[key][0][idx]:
-                        #             print(f"last:{self.dic_channel2[key][0][idx]}")
-                        #             self.specific_row = idx + 5
-                        #             break
-                        # else:
 
             if no_of_repeated == 1:
                 self.previous_line2 = self.no_of_line_2
@@ -1042,21 +965,7 @@ class File:
                     self.y_fig2[index_2] = []
                 if self.no_of_line_2 > 1 and len(self.visited_channel2) != 1:
                     self.present_line2[self.no_of_line_2 - 1] = self.current_data_2
-                #     for key in self.dic_channel2.items():
-                #         print(key[1][0][self.current_data_2])
-                #         begin_idx_ch2 = key[1][0][self.current_data_2]
-                #         break
-                #     for idx_2 in range(len(self.data_xline_2)):
-                #         print(len(self.dic_channel2))
-                #         print(self.dic_channel2.keys())
-                #         if self.data_xline_2[idx_2] >= begin_idx_ch2:
-                #             print(f"idx2:{idx_2}")
-                #             self.data_xline_2 = self.data_xline_2[idx_2:]
-                #             self.data_yline_2 = self.data_yline_2[idx_2:]
-                #             print(f"len_x2:{len(self.data_xline_2)}")
-                #             break
-                #     self.dic_channel2[self.no_of_line_2 - 1] = self.data_xline_2, self.data_yline_2
-                # else:
+
                 self.dic_channel2[self.no_of_line_2 - 1] = self.read_ecg_data_from_csv(file_namee)
                 if graph_ch2:
                     self.ani2 = FuncAnimation(self.fig2, self.animate_fig2, interval=self.delay_interval,
@@ -1127,6 +1036,8 @@ class File:
             self.files_name.append(file_name)
             file_name = str(file_name)
             self.line = file_name.split('/')[-1].split('.')[0]
+            self.Qwindow.child_item.setText(0, self.line)
+            self.tree_port1.addChild(self.Qwindow.child_item)
             self.Qwindow.signals_name.addItem(self.line)
             self.signal_values_list = self.read_ecg_data_from_csv(file_name)
             self.row_counter = self.row_counter + 1
@@ -1232,13 +1143,11 @@ class File:
         # Adding Header for the comment section and styling it
         doctor_header = "Doctor's Comments: "
         dheader_text_style = styles.getSampleStyleSheet()["Normal"]
-        # dheader_text_style.alignment = 1  # 1 represents center alignment
         dheader_text_style.fontSize = 16  # Set font size to 12px
         dheader_text_style.fontWeight = 'bold'  # Set font size to 12px
         paragraph = Paragraph(doctor_header, dheader_text_style)
         self.page_container.append(paragraph)
         self.page_container.append(Spacer(1, 0.5 * inch))
-
         # Add text to the PDF
         text = self.Dwindow.comment_section.toPlainText()
         text_style = styles.getSampleStyleSheet()["Normal"]
@@ -1271,22 +1180,35 @@ class MainApp(QMainWindow, MainUI):
         self.setWindowTitle("Signal Real-Time Monitoring")
         self.Timer = QTimer(self)
 
+    def contextMenuEvent(self, event):
+        menu = QMenu(self)
+        move_action = menu.addAction("Change Port")
+        color_action = menu.addAction("Change Color")
+        hide_action = menu.addAction("Hide")
+        delete_action = menu.addAction("Delete")
+        action = menu.exec_(self.mapToGlobal(event.pos()))
+        if action == move_action:
+            pass
+        elif action == color_action:
+            pass
+        elif action == hide_action:
+            pass
+        elif action == delete_action:
+            pass
+
     # Calculate the Mean of the signal
     def calc_mean(self, values):
         return np.mean(values)
 
     # Calculate the Standard Deviation of the signal
-
     def calc_std(self, values):
         return np.std(values)
 
     # Calculate the signal Duration
-
     def calc_duration(self, time):
         return np.max(time)
 
     # Calculate minimum and maximum values
-
     def calc_min_max_values(self, values):
         return np.min(values), np.max(values)
 
