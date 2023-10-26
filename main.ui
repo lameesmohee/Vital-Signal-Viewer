@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1764</width>
+    <width>1406</width>
     <height>1051</height>
    </rect>
   </property>
@@ -654,8 +654,8 @@ QComboBox::item:hover {
    <widget class="QPushButton" name="pushButton_plot">
     <property name="geometry">
      <rect>
-      <x>980</x>
-      <y>10</y>
+      <x>1150</x>
+      <y>20</y>
       <width>81</width>
       <height>31</height>
      </rect>
@@ -757,14 +757,23 @@ QPushButton:pressed {
    <widget class="QPushButton" name="color_picker_button">
     <property name="geometry">
      <rect>
-      <x>580</x>
-      <y>0</y>
+      <x>230</x>
+      <y>470</y>
       <width>31</width>
       <height>31</height>
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">background-color:red;</string>
+     <string notr="true">
+
+QPushButton {
+    background-color: red; /* Background color*/
+    border: 2px solid #849dad; /* Border style*/
+    border-radius: 15px; /* Rounded corners */
+    color: #ffffff; /* Text color */
+    padding: 5px 15px; /* Padding around the text */
+    font-size: 14px; /* Text font size */
+}</string>
     </property>
     <property name="text">
      <string/>
@@ -914,7 +923,7 @@ border: 2px solid #849dad; </string>
    <widget class="QWidget" name="verticalLayoutWidget_4">
     <property name="geometry">
      <rect>
-      <x>120</x>
+      <x>280</x>
       <y>470</y>
       <width>471</width>
       <height>41</height>
@@ -925,7 +934,7 @@ border: 2px solid #849dad; </string>
    <widget class="QWidget" name="verticalLayoutWidget_5">
     <property name="geometry">
      <rect>
-      <x>120</x>
+      <x>280</x>
       <y>910</y>
       <width>501</width>
       <height>41</height>
@@ -991,7 +1000,7 @@ QTableWidget QHeaderView::section { text-align: center; }
    <widget class="QPushButton" name="pause_button">
     <property name="geometry">
      <rect>
-      <x>70</x>
+      <x>60</x>
       <y>470</y>
       <width>41</width>
       <height>41</height>
@@ -1007,7 +1016,7 @@ QTableWidget QHeaderView::section { text-align: center; }
    <widget class="QPushButton" name="pause_button_2">
     <property name="geometry">
      <rect>
-      <x>70</x>
+      <x>60</x>
       <y>910</y>
       <width>41</width>
       <height>41</height>
@@ -1094,17 +1103,131 @@ color:#849dad;</string>
      <string>SPEED</string>
     </property>
    </widget>
-   <widget class="QTreeWidget" name="info_container">
+   <widget class="QPushButton" name="hide_button1">
     <property name="geometry">
      <rect>
-      <x>1420</x>
-      <y>80</y>
-      <width>331</width>
-      <height>881</height>
+      <x>100</x>
+      <y>470</y>
+      <width>41</width>
+      <height>41</height>
      </rect>
     </property>
-    <property name="contextMenuPolicy">
-     <enum>Qt::DefaultContextMenu</enum>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="shortcut">
+     <string>Ctrl+R</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="hide_button2">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>910</y>
+      <width>41</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="shortcut">
+     <string>Ctrl+R</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="delete_button1">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>470</y>
+      <width>41</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="shortcut">
+     <string>Ctrl+R</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="delete_button2">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>910</y>
+      <width>41</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="shortcut">
+     <string>Ctrl+R</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="move_button2">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>910</y>
+      <width>41</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="shortcut">
+     <string>Ctrl+R</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="move_button1">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>470</y>
+      <width>41</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="shortcut">
+     <string>Ctrl+R</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="color_picker_button_2">
+    <property name="geometry">
+     <rect>
+      <x>230</x>
+      <y>910</y>
+      <width>31</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">
+
+QPushButton {
+    background-color: red; /* Background color*/
+    border: 2px solid #849dad; /* Border style*/
+    border-radius: 15px; /* Rounded corners */
+    color: #ffffff; /* Text color */
+    padding: 5px 15px; /* Padding around the text */
+    font-size: 14px; /* Text font size */
+}</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>10</width>
+      <height>10</height>
+     </size>
     </property>
    </widget>
   </widget>
@@ -1113,7 +1236,7 @@ color:#849dad;</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1764</width>
+     <width>1406</width>
      <height>22</height>
     </rect>
    </property>

@@ -36,6 +36,8 @@ DocumentWindowUI, _ = loadUiType(path.join(path.dirname(__file__), 'DocumentWind
 class File:
     def __init__(self):
         # self.child_item = None
+        self.splitted_names = []
+        self.menu = None
         self.ani_list = []
         self.ani = None
         self.ani2 = None
@@ -114,15 +116,6 @@ class File:
         self.pdf_filename = f"Medical Report {self.pdf_counter}.pdf"
         self.doc = SimpleDocTemplate(self.pdf_filename, pagesize=letter)
         self.Qwindow.tableWidget.hide()
-        self.tree_port1 = QTreeWidgetItem(self.Qwindow.info_container, ["Port 1"])
-        font = QFont()
-        font.setPointSize(16)
-        self.tree_port1.setFont(0, font)
-        self.tree_port2 = QTreeWidgetItem(self.Qwindow.info_container, ["Port 2"])
-        self.tree_port2.setFont(0, font)
-        self.Qwindow.info_container.addTopLevelItem(self.tree_port1)
-        self.Qwindow.info_container.addTopLevelItem(self.tree_port2)
-        self.Qwindow.child_item = QTreeWidgetItem(self.tree_port1)
 
     def handle_button_push(self):
         self.Qwindow.open_file.triggered.connect(self.browse_file)
@@ -159,9 +152,19 @@ class File:
         shortcut2.activated.connect(self.Qwindow.pause_button_2.click)
         shortcut1 = QShortcut(QKeySequence('Ctrl+S'), self.Qwindow)
         shortcut1.activated.connect(self.Qwindow.pause_button.click)
+        self.Qwindow.hide_button1.clicked.connect(lambda: self.hide(self.Qwindow.hide_button1))
+        QCoreApplication.processEvents()
+        self.Qwindow.hide_button2.clicked.connect(lambda: self.hide(self.Qwindow.hide_button2))
+        QCoreApplication.processEvents()
+        self.Qwindow.delete_button1.clicked.connect(lambda: self.delete(self.Qwindow.delete_button1))
+        QCoreApplication.processEvents()
+        self.Qwindow.delete_button2.clicked.connect(lambda: self.delete(self.Qwindow.delete_button2))
+        QCoreApplication.processEvents()
+        self.Qwindow.move_button1.clicked.connect(lambda: self.move(self.Qwindow.move_button1))
+        QCoreApplication.processEvents()
+        self.Qwindow.move_button2.clicked.connect(lambda: self.move(self.Qwindow.move_button2))
+        QCoreApplication.processEvents()
 
-        # self.Qwindow.child_item.setContextMenuPolicy(Qt.CustomContextMenu)
-        # self.Qwindow.child_item.customContextMenuRequested.connect(self.Qwindow.showContextMenu)
 
     def Ui_graph_channel2(self):  # Styling the UI of the 2nd graph
         self.fig2.set_facecolor('#F0F5F9')
@@ -233,6 +236,12 @@ class File:
         self.Qwindow.pause_button_2.hide()
         self.Qwindow.rewind_button1.hide()
         self.Qwindow.rewind_button2.hide()
+        self.Qwindow.move_button1.hide()
+        self.Qwindow.move_button2.hide()
+        self.Qwindow.delete_button1.hide()
+        self.Qwindow.delete_button2.hide()
+        self.Qwindow.hide_button1.hide()
+        self.Qwindow.hide_button2.hide()
         self.Qwindow.pause_button.setStyleSheet("background-color: #849dad;"
                                                 " color: white;"
                                                 "font-size: 16px")
@@ -249,6 +258,78 @@ class File:
         self.Qwindow.graphicsView_channel1.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.Qwindow.graphicsView_channel2.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.Qwindow.graphicsView_channel2.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.Qwindow.hide_button1.setStyleSheet("background-color: #849dad;"
+                                                  "color: white;"
+                                                  "font-size: 16px")
+        self.Qwindow.hide_button2.setStyleSheet("background-color: #849dad;"
+                                                "color: white;"
+                                                "font-size: 16px")
+        hide_icon = icon("ph.eye-slash-fill", color='white')
+        self.Qwindow.hide_button1.setIcon(hide_icon)
+        self.Qwindow.hide_button2.setIcon(hide_icon)
+        self.Qwindow.delete_button1.setStyleSheet("background-color: #849dad;"
+                                                "color: white;"
+                                                "font-size: 16px")
+        self.Qwindow.delete_button2.setStyleSheet("background-color: #849dad;"
+                                                  "color: white;"
+                                                  "font-size: 16px")
+        delete_icon = icon("ri.delete-bin-5-line", color='white')
+        self.Qwindow.delete_button1.setIcon(delete_icon)
+        self.Qwindow.delete_button2.setIcon(delete_icon)
+
+        self.Qwindow.move_button1.setStyleSheet("background-color: #849dad;"
+                                                  "color: white;"
+                                                  "font-size: 16px")
+        self.Qwindow.move_button2.setStyleSheet("background-color: #849dad;"
+                                                  "color: white;"
+                                              "font-size: 16px;")
+        move_icon = icon("mdi6.swap-vertical-variant", color='white')
+        self.Qwindow.move_button1.setIcon(move_icon)
+        self.Qwindow.move_button2.setIcon(move_icon)
+
+    def hide(self, button_name):
+        if button_name == self.Qwindow.hide_button1:
+            self.menu = QMenu()
+            for file_name in self.splitted_names:
+                self.menu.addAction(file_name)
+            action = self.menu.exec_(self.Qwindow.hide_button1.mapToGlobal(
+                self.Qwindow.hide_button1.rect().bottomLeft()))
+        else:
+            self.menu = QMenu()
+            for file_name in self.splitted_names:
+                self.menu.addAction(file_name)
+            action = self.menu.exec_(self.Qwindow.hide_button2.mapToGlobal(
+                self.Qwindow.hide_button2.rect().bottomLeft()))
+
+    def delete(self, button_name):
+        if button_name == self.Qwindow.delete_button1:
+            self.menu = QMenu()
+            for file_name in self.splitted_names:
+                self.menu.addAction(file_name)
+            action = self.menu.exec_(self.Qwindow.delete_button1.mapToGlobal(
+                self.Qwindow.delete_button1.rect().bottomLeft()))
+        else:
+            self.menu = QMenu()
+            for file_name in self.splitted_names:
+                self.menu.addAction(file_name)
+            action = self.menu.exec_(self.Qwindow.delete_button2.mapToGlobal(
+                self.Qwindow.delete_button2.rect().bottomLeft()))
+
+    def move(self, button_name):
+        if button_name == self.Qwindow.move_button1:
+            self.menu = QMenu()
+            for file_name in self.splitted_names:
+                self.menu.addAction(file_name)
+            action = self.menu.exec_(self.Qwindow.move_button1.mapToGlobal(
+                self.Qwindow.move_button1.rect().bottomLeft()))
+        else:
+            self.menu = QMenu()
+            for file_name in self.splitted_names:
+                self.menu.addAction(file_name)
+            action = self.menu.exec_(self.Qwindow.move_button2.mapToGlobal(
+                self.Qwindow.move_button2.rect().bottomLeft()))
+
+
 
     def Pause_pan(self):
         if self.ax.get_navigate_mode() == "PAN" and self.play_ch1:
@@ -903,6 +984,10 @@ class File:
                     self.Qwindow.tableWidget.show()
                     self.Qwindow.pause_button.show()
                     self.Qwindow.rewind_button1.show()
+                    self.Qwindow.move_button1.show()
+                    self.Qwindow.delete_button1.show()
+                    self.Qwindow.hide_button1.show()
+
                     self.Qwindow.verticalLayout_toolbar1.addWidget(self.toolbar_1)
 
         # channel2 /graph 2
@@ -1011,6 +1096,9 @@ class File:
                     self.Qwindow.tableWidget.show()
                     self.Qwindow.pause_button_2.show()
                     self.Qwindow.rewind_button2.show()
+                    self.Qwindow.move_button2.show()
+                    self.Qwindow.delete_button2.show()
+                    self.Qwindow.hide_button2.show()
                     self.Qwindow.verticalLayout_toolbar2.addWidget(self.toolbar_2)
 
     def current_file_and_channel(self):
@@ -1018,7 +1106,8 @@ class File:
 
     def show_color_dialog(self):  # Function to open a color picker dialog for the signal
         color = QColorDialog.getColor()
-        self.Qwindow.color_picker_button.setStyleSheet(f"background-color: {color.name()}; color: white;")
+        self.Qwindow.color_picker_button.setStyleSheet(f"background-color: {color.name()}; color: white;"
+                                                       f"border-radius:50%;")
         # Create a palette for the button text color and set it to the selected color
         palette = QPalette()
         palette.setColor(QPalette.ButtonText, color)
@@ -1036,8 +1125,7 @@ class File:
             self.files_name.append(file_name)
             file_name = str(file_name)
             self.line = file_name.split('/')[-1].split('.')[0]
-            self.Qwindow.child_item.setText(0, self.line)
-            self.tree_port1.addChild(self.Qwindow.child_item)
+            self.splitted_names.append(self.line)
             self.Qwindow.signals_name.addItem(self.line)
             self.signal_values_list = self.read_ecg_data_from_csv(file_name)
             self.row_counter = self.row_counter + 1
@@ -1179,22 +1267,6 @@ class MainApp(QMainWindow, MainUI):
         self.setupUi(self)
         self.setWindowTitle("Signal Real-Time Monitoring")
         self.Timer = QTimer(self)
-
-    def contextMenuEvent(self, event):
-        menu = QMenu(self)
-        move_action = menu.addAction("Change Port")
-        color_action = menu.addAction("Change Color")
-        hide_action = menu.addAction("Hide")
-        delete_action = menu.addAction("Delete")
-        action = menu.exec_(self.mapToGlobal(event.pos()))
-        if action == move_action:
-            pass
-        elif action == color_action:
-            pass
-        elif action == hide_action:
-            pass
-        elif action == delete_action:
-            pass
 
     # Calculate the Mean of the signal
     def calc_mean(self, values):
