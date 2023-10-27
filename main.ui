@@ -757,7 +757,7 @@ QPushButton:pressed {
    <widget class="QPushButton" name="color_picker_button">
     <property name="geometry">
      <rect>
-      <x>230</x>
+      <x>310</x>
       <y>470</y>
       <width>31</width>
       <height>31</height>
@@ -923,7 +923,7 @@ border: 2px solid #849dad; </string>
    <widget class="QWidget" name="verticalLayoutWidget_4">
     <property name="geometry">
      <rect>
-      <x>280</x>
+      <x>350</x>
       <y>470</y>
       <width>471</width>
       <height>41</height>
@@ -934,9 +934,9 @@ border: 2px solid #849dad; </string>
    <widget class="QWidget" name="verticalLayoutWidget_5">
     <property name="geometry">
      <rect>
-      <x>280</x>
+      <x>350</x>
       <y>910</y>
-      <width>501</width>
+      <width>471</width>
       <height>41</height>
      </rect>
     </property>
@@ -1202,7 +1202,7 @@ color:#849dad;</string>
    <widget class="QPushButton" name="color_picker_button_2">
     <property name="geometry">
      <rect>
-      <x>230</x>
+      <x>310</x>
       <y>910</y>
       <width>31</width>
       <height>31</height>
@@ -1228,6 +1228,80 @@ QPushButton {
       <width>10</width>
       <height>10</height>
      </size>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="speed_up_button2">
+    <property name="geometry">
+     <rect>
+      <x>220</x>
+      <y>910</y>
+      <width>41</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="shortcut">
+     <string>Ctrl+R</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="speed_down_button2">
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>910</y>
+      <width>41</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="shortcut">
+     <string>Ctrl+R</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="speed_up_button1">
+    <property name="geometry">
+     <rect>
+      <x>220</x>
+      <y>470</y>
+      <width>41</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="shortcut">
+     <string>Ctrl+R</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="speed_down_button1">
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>470</y>
+      <width>41</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="shortcut">
+     <string>Ctrl+R</string>
     </property>
    </widget>
   </widget>
