@@ -36,6 +36,7 @@ DocumentWindowUI, _ = loadUiType(path.join(path.dirname(__file__), 'DocumentWind
 class File:
     def __init__(self):
         # self.child_item = None
+        self.add_new_signal = False
         self.x_min_ch2 = 0
         self.move_to_ch1 = False
         self.hide_action_ch1 = False
@@ -94,6 +95,7 @@ class File:
         self.lines1 = [None] * 100
         self.lines2 = [None] * 100
         self.Qwindow = MainApp()
+
         self.Dwindow = DocumentWindow()
         self.fig = plt.figure(figsize=(898 / 80, 345 / 80), dpi=80)
         self.fig2 = plt.figure(figsize=(898 / 80, 345 / 80), dpi=80)
@@ -126,17 +128,12 @@ class File:
     def handle_button_push(self):
         self.Qwindow.open_file.triggered.connect(self.browse_file)
         QCoreApplication.processEvents()
-        self.Qwindow.pushButton_plot.clicked.connect(self.Plot)
+        # self.Qwindow.pushButton_plot.clicked.connect(self.Plot)
         QCoreApplication.processEvents()
-        self.Qwindow.minus_button.clicked.connect(self.decrease_speed)
-        QCoreApplication.processEvents()
-        self.Qwindow.plus_button.clicked.connect(self.increase_speed)
-        QCoreApplication.processEvents()
-        # self.Qwindow.checkBox_2.stateChanged.connect(self.Ischecked)
+        # self.Qwindow.minus_button.clicked.connect(self.decrease_speed)
         # QCoreApplication.processEvents()
-        # self.Qwindow.checkBox_3.toggled.connect(self.Ischecked)
+        # self.Qwindow.plus_button.clicked.connect(self.increase_speed)
         QCoreApplication.processEvents()
-        # self.Qwindow.checkBox_3.setCheckable(True)
         self.Qwindow.color_picker_button.clicked.connect(self.show_color_dialog_ch1)
         self.Qwindow.color_picker_button_2.clicked.connect(self.show_color_dialog_ch2)
         self.Qwindow.rewind_button2.clicked.connect(self.rewind_channel2)
@@ -171,6 +168,13 @@ class File:
         QCoreApplication.processEvents()
         self.Qwindow.move_button2.clicked.connect(lambda: self.move(self.Qwindow.move_button2))
         QCoreApplication.processEvents()
+        self.Qwindow.speed_up_button1.clicked.connect(lambda: self.increase_speed(self.Qwindow.speed_up_button1))
+        QCoreApplication.processEvents()
+        self.Qwindow.speed_up_button2.clicked.connect(lambda: self.increase_speed(self.Qwindow.speed_up_button2))
+        QCoreApplication.processEvents()
+        self.Qwindow.speed_down_button1.clicked.connect(lambda: self.decrease_speed(self.Qwindow.speed_down_button1))
+        QCoreApplication.processEvents()
+        self.Qwindow.speed_down_button2.clicked.connect(lambda: self.decrease_speed(self.Qwindow.speed_down_button2))
 
     def Ui_graph_channel2(self):   # Styling the UI of the 2nd graph
         self.fig2.set_facecolor('#F0F5F9')
@@ -315,6 +319,7 @@ class File:
         self.Qwindow.speed_down_button1.setIcon(speed_down_icon)
         self.Qwindow.speed_down_button2.setIcon(speed_down_icon)
 
+
     def hide_channel2(self,file_name):
         file_part = file_name.split('/')[-1].split('.')[0]
         if  file_part in self.visited_channel2:
@@ -349,7 +354,7 @@ class File:
 
     def hide_channel1(self,file_name):
         file_part = file_name.split('/')[-1].split('.')[0]
-        if  file_part in self.visited_channel1:   # filepart: name of signal
+        if file_part in self.visited_channel1:   # filepart: name of signal
             print(self.visited_channel1)
             del self.count_files_channel1[file_part]
             self.visited_channel1 = [file for idx, file in enumerate(self.visited_channel1) if file != file_part]
@@ -362,12 +367,12 @@ class File:
                 else:
                     self.name_files_ch1[item[1]] = item[0]
             del self.dic_channel1[self.hidden_idx_1]
+
             self.lines1[self.hidden_idx_1] = "None"
+
             if self.hidden_idx_1 in self.present_line1.keys():
                 del self.present_line1[self.hidden_idx_1]
             self.fig.clf()
-            # self.fig.canvas.draw()
-            # self.fig = plt.figure(figsize=(898 / 80, 345 / 80), dpi=80)
             self.Ui_graph_channel1()
             for idx_line_ch1 in self.dic_channel1.items():
                 self.lines1[idx_line_ch1[0]], = self.ax.plot([], [], label=self.name_files_ch1[idx_line_ch1[0]],
@@ -388,7 +393,7 @@ class File:
         self.visited_channel2.append(file_part)
         self.splitted_names_ch2.append(file_part)
 
-        self.specific_row_2 = 2
+
         self.x_min_ch2 = self.Time[self.specific_row_2]
         self.ax2.set_xlim(self.Time[self.specific_row_2], 2)
         data_y = self.signal_values_list
@@ -403,7 +408,7 @@ class File:
         if no_of_repeated == 1:
             self.previous_line2 = self.no_of_line_2
             self.no_of_line_2 += 1
-            self.ax2.set_xlim(self.Time[self.specific_row_2], 2)
+            self.ax2.set_xlim(self.Time[3], self.Time[30])
 
             self.ax2.set_ylim(y_range)
             self.delay_interval = 200
@@ -470,9 +475,7 @@ class File:
                 self.Qwindow.move_button2.show()
                 self.Qwindow.delete_button2.show()
                 self.Qwindow.hide_button2.show()
-                self.Qwindow.speed_up_button1.show()
                 self.Qwindow.speed_up_button2.show()
-                self.Qwindow.speed_down_button1.show()
                 self.Qwindow.speed_down_button2.show()
                 self.Qwindow.verticalLayout_toolbar2.addWidget(self.toolbar_2)
 
@@ -486,8 +489,8 @@ class File:
                 break
 
     def hide(self, button_name):
-        if len(self.splitted_names_ch1) > 1:
-            if button_name == self.Qwindow.move_button1:
+        if button_name == self.Qwindow.hide_button1:
+            if len(self.splitted_names_ch1) > 1:
                 self.menu = QMenu()
                 file = self.menu.triggered.connect(self.actionClicked)
                 for file_name in self.splitted_names_ch1:
@@ -499,8 +502,11 @@ class File:
                     print(f"act:{action.text()}")
                     file_name = action.text()
                     self.hide_channel1(file_name)
-        else:
-            self.hide_channel1(self.splitted_names_ch1[0])
+            else:
+                self.hide_channel1(self.splitted_names_ch1[0])
+
+
+
 
         if button_name == self.Qwindow.move_button2:
             if len(self.splitted_names_ch2) > 1:
@@ -712,10 +718,10 @@ class File:
         if self.Qwindow.link_button.isChecked():
             self.link = True
             # same time frames
-            self.ax.set_xlim(0, 2)
-            self.ax2.set_xlim(0, 2)
-            self.ax.set_ylim(-1, 1)
-            self.ax2.set_ylim(-1, 1)
+            # self.ax.set_xlim(0, 2)
+            # self.ax2.set_xlim(0, 2)
+            # self.ax.set_ylim(-1, 1)
+            # self.ax2.set_ylim(-1, 1)
         else:
             self.link = False
 
@@ -753,7 +759,7 @@ class File:
                 # append data to update graph2 to first line
                 if self.link:
                     self.x_fig2[idx_line_ch2[0]].append(self.Time[self.specific_row])
-                    self.y_fig2[idx_line_ch2[0]].append(idx_line_ch2[1][self.specific_row])
+                    self.y_fig2[idx_line_ch2[0]].append(idx_line_ch2[1][self.specific_row_2])
                 else:
                     self.x_fig2[idx_line_ch2[0]].append(self.Time[self.specific_row_2])
                     self.y_fig2[idx_line_ch2[0]].append(idx_line_ch2[1][self.specific_row_2])
@@ -818,6 +824,7 @@ class File:
                 print(f"time:{self.y_fig1[idx_line_ch1[0]]}")
                 self.lines1[idx_line_ch1[0]].set_data(self.x_fig1[idx_line_ch1[0]], self.y_fig1[idx_line_ch1[0]])
 
+
             if self.link:  # check if two graphs linked or not
                 if self.current_data > 30 and found1:
                     # self.current_data = self.specific_row - current_idx
@@ -849,11 +856,24 @@ class File:
         else:
             if button_name == self.Qwindow.speed_up_button1:
                 self.delay_interval = 40
+                self.pause_ch1 = True
+                self.pause_ch2 = False
+
+            elif button_name == self.Qwindow.speed_up_button2:
+                self.delay_interval = 40
+                self.pause_ch2 = True
+                self.pause_ch1 = False
+
+            elif self.link:
+                self.delay_interval = 40
+                self.pause_ch1 = True
+                self.pause_ch2 = True
 
 
 
 
-    def decrease_speed(self):  # decrease speed
+
+    def decrease_speed(self, button_name):  # decrease speed
         if self.delay_interval is None:
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Warning)
@@ -861,23 +881,74 @@ class File:
             msg.show()
             msg.exec_()
         else:
-            # check which channel selected
-            self.delay_interval = 200
-            channel1, channel2 = self.Ischecked()
-            if channel1 == "channel1" and channel2 == "None":
+            if button_name == self.Qwindow.speed_down_button1:
+                self.delay_interval = 200
                 self.pause_ch1 = True
-            elif channel2 == "channel2" and channel1 == "None":
+                self.pause_ch2 = False
+            elif button_name == self.Qwindow.speed_down_button2 :
+                self.delay_interval = 200
                 self.pause_ch2 = True
-            elif channel2 == "channel2" and channel1 == "channel1":
-                self.pause_ch1 = True
-                self.pause_ch2 = True
-            else:
-                msg = QMessageBox()
-                msg.setIcon(QMessageBox.Warning)
-                msg.setInformativeText("Please Upload a Signal")
-                msg.show()
-                msg.exec_()
+                self.pause_ch1 = False
 
+            elif self.link:
+                self.delay_interval = 200
+                self.pause_ch1 = True
+                self.pause_ch2 = True
+
+    def pan_channel1(self):
+        self.fig.canvas.mpl_connect('button_press_event', self.buttonZemaphore)
+        self.fig.canvas.mpl_connect('button_release_event', self.buttonZemaphore)
+        self.fig.canvas.mpl_connect('motion_notify_event', self.pan_fun_ch1)
+
+    def pan_channel2(self):
+        self.fig2.canvas.mpl_connect('button_press_event', self.buttonZemaphore)
+        self.fig2.canvas.mpl_connect('button_release_event', self.buttonZemaphore)
+        self.fig2.canvas.mpl_connect('motion_notify_event', self.pan_fun_ch2)
+
+    def buttonZemaphore(self, event):
+        # changing the flags for panning
+        if (event.name == 'button_press_event') and (event.button.numerator == 1):
+            # left-mouse button press: activate pan
+            self.oldxy = [event.xdata, event.ydata]
+            self.panningflag = 1
+
+        elif (event.name == 'button_release_event') and (event.button.numerator == 1):
+            # left-mouse button release: deactivate pan
+            self.panningflag = 0
+
+    def pan_fun_ch1(self, event):
+        # drag-panning the axis
+        # This function has to be efficient, as it is polled often.
+        if (self.panningflag == 1) and (event.inaxes != None):
+            self.pan_ch1 = True
+            # do pan
+            self.ax = event.inaxes  # set the axis to work on
+
+            x, y = event.xdata, event.ydata
+            print(self.oldxy[0], self.oldxy[1])
+            print(f"x,y:{x, y}")
+            print(f"limits:{self.ax.get_xlim()}")
+            self.ax.set_xlim(self.ax.get_xlim() + self.oldxy[0] - x)  # set new axes limits
+            self.ax.set_ylim(self.ax.get_ylim() + self.oldxy[1] - y)
+
+            self.ax.figure.canvas.draw()  # force re-draw
+
+    def pan_fun_ch2(self, event):
+        # drag-panning the axis
+        # This function has to be efficient, as it is polled often.
+        if (self.panningflag == 1) and (event.inaxes != None):
+            self.pan_ch2 = True
+            # do pan
+            self.ax2 = event.inaxes  # set the axis to work on
+
+            x, y = event.xdata, event.ydata
+            print(self.oldxy[0], self.oldxy[1])
+            print(f"x,y:{x, y}")
+            print(f"limits:{self.ax.get_xlim()}")
+            self.ax2.set_xlim(self.ax2.get_xlim() + self.oldxy[0] - x)  # set new axes limits
+            self.ax2.set_ylim(self.ax2.get_ylim() + self.oldxy[1] - y)
+
+            self.ax2.figure.canvas.draw()  # force re-draw
     def rewind_channel1(self):  # rewind channels 30 points as 30 milisecond (ms) for channel1
         x_min = self.ax.get_xlim()
         self.rewind_ch1 = True
@@ -939,6 +1010,11 @@ class File:
                 print(self.present_line1[item[0]])
                 self.present_line1[item[0]] -= 31
         print(f"spe:{self.specific_row}")
+        if self.rewind_ch1 and  not self.rewind_ch2 and self.link :
+            self.rewind_channel2()
+
+
+
 
     def rewind_channel2(self):
         self.rewind_ch2 = True
@@ -1009,317 +1085,11 @@ class File:
                 self.present_line2[item[0]] -= 31
         print(f"spe:{self.specific_row_2}")
 
-        if self.rewind_ch2 and self.link:
+        if self.rewind_ch2 and    not self.rewind_ch1 and  self.link:
             self.rewind_channel1()
 
-    def channels_checked(self):  # fun return which channel and path of file which selected
-        check_list = self.Ischecked()
-        file_namee, channel1, channel2 = self.current_file_and_channel(), check_list[0], check_list[1]
-        file_part = file_namee.split('/')[-1].split('.')[0]
-        if channel1 == "None" and channel2 == "None" and file_part not in self.visited_channel1:
-            channel1 = "channel1"
-            self.Qwindow.checkBox_2.setChecked(True)
 
-        print(file_namee)
-        print(channel1)
-        print(channel2)
-        if len(file_namee) == 0:  # check if the file which is chosen or not
-            msg = QMessageBox()
-            msg.setIcon(QMessageBox.Warning)
-            msg.setInformativeText("Please Upload A Signal")
-            msg.show()
-            msg.exec_()
-        elif (channel1 == "None" and len(self.visited_channel1) == 0) and (
-                channel2 == "None" and len(self.visited_channel2) == 0):
-            msg = QMessageBox()
-            msg.setIcon(QMessageBox.Warning)
-            msg.setInformativeText("Please Enter A Channel")
-            msg.show()
-            msg.exec_()
-        else:
-            print(self.files_name)  # get name of file
-            for file in self.files_name:
-                file_part = file.split('/')[-1].split('.')[0]
-                if file_part == file_namee:
-                    file_namee = file
-                    # Add signal in visited list
-                    if channel1 == "channel1" and channel2 == "None":
-                        self.visited_channel1.append(file_part)
-                        break
-                    elif channel2 == "channel2" and channel1 == "None":
-                        self.visited_channel2.append(file_part)
-                        break
-                    elif channel2 == "channel2" and file_part in self.visited_channel1:
-                        self.visited_channel2.append(file_part)
-                        if channel1 == "channel1":
-                            self.visited_channel1.append(file_part)
-                        break
-                    elif channel1 == "channel1" and file_part in self.visited_channel2:
-                        self.visited_channel1.append(file_part)
-                        if channel2 == "channel2":
-                            self.visited_channel2.append(file_part)
-                        break
-                    elif channel1 == "channel1" and channel2 == "channel2":
-                        self.visited_channel2.append(file_part)
-                        self.visited_channel1.append(file_part)
-                        break
-                    break
-            # default limits TO link
-            self.signal_values_list = self.read_ecg_data_from_csv(file_namee)
-            return file_part, file_namee, channel1, channel2
 
-    def Plot(self):  # plot animation
-        file_part, file_namee, channel1, channel2 = self.channels_checked()
-        # get range of data of signal
-        self.ax.set_xlim(0, 2)
-        data_y = self.signal_values_list
-
-        # print(f"x_range:{x_range}")
-        y_range = (floor(min(data_y)), ceil(max(data_y)))
-
-        print(file_part)
-        # count times which signal adds
-        count_files_channel1 = Counter(self.visited_channel1)
-        count_files_channel2 = Counter(self.visited_channel2)  # {key:value}
-        # hide channels
-        print(self.visited_channel1)
-        if channel1 == "None" and file_part in self.visited_channel1:  ##filepart: name of signal
-            print(self.visited_channel1)
-            self.visited_channel1 = [file for idx, file in enumerate(self.visited_channel1) if file != file_part]
-            print("hallo")
-            print(len(self.visited_channel1))
-
-            if len(self.visited_channel1) == 0:
-                self.specific_row = 0
-                self.frames_channel1 += 300
-
-            for item in self.hidden_line_ch1.items():
-                if item[0] == file_part:
-                    self.hidden_idx_1 = item[1]
-                else:
-                    self.name_files_ch1[item[1]] = item[0]
-
-            del self.dic_channel1[self.hidden_idx_1]
-
-            self.lines1[self.hidden_idx_1] = "None"
-            if self.hidden_idx_1 in self.present_line1.keys():
-                del self.present_line1[self.hidden_idx_1]
-            self.fig.clf()
-            self.Ui_graph_channel1()
-            for idx_line_ch1 in self.dic_channel1.items():
-                self.lines1[idx_line_ch1[0]], = self.ax.plot([], [], label=self.name_files_ch1[idx_line_ch1[0]],
-                                                             color=self.colors_channel1[idx_line_ch1[0]])
-            self.ax.legend()
-
-        # Channel 1 /graph 1
-        if channel1 == "channel1":
-            for item in count_files_channel1.items():  # get no of repeateed signal
-                if item[0] == file_part:
-                    no_of_repeated = item[1]
-                    break
-            print(len(self.present_line1))
-            # to transfer signal from graph 1 to graph 2
-            if file_part in self.visited_channel2 and len(self.visited_channel2) == 1:
-                for key, value in self.files_index_ch1.items():
-                    if file_part == value:
-                        self.specific_row_2 = self.specific_row - 1
-                        break
-
-            # show line
-            if no_of_repeated == 1:
-                self.previous_line1 = self.no_of_line
-                self.no_of_line += 1  # every line take number which is key to access line
-                # put limits
-                # self.ax.set_xlim(x_range)
-                self.ax.set_ylim(y_range)
-                self.ax.set_xlim(0, 2)
-                self.delay_interval = 200
-                if self.no_of_line == 1:  # to call func animation once
-                    graph_ch1 = True
-                else:
-                    graph_ch1 = False
-                for index in range(self.previous_line1, self.no_of_line):  # store lines of graph1
-                    self.hidden_line_ch1[file_part] = index
-                    self.files_index_ch1[index] = file_part
-                    self.lines1[index], = self.ax.plot([], [], label=file_part, color=self.signal_color)
-                    self.colors_channel1[index] = self.signal_color
-                    self.x_fig1[index] = []
-                    self.y_fig1[index] = []
-                # to add another /signals and begin  from last time of first line
-                if self.no_of_line > 1 and len(self.visited_channel1) != 1:
-
-                    self.present_line1[self.no_of_line - 1] = self.current_data
-
-                self.dic_channel1[self.no_of_line - 1] = self.read_ecg_data_from_csv(file_namee)
-                if graph_ch1:  # create animation
-                    self.ani = FuncAnimation(self.fig, self.animate_fig1, interval=200,
-                                             frames=self.frames_channel1, repeat=False)
-                self.ax.legend()  # set label to lines
-                if graph_ch1:  # show graph on graphics view
-                    scene1 = QtWidgets.QGraphicsScene()
-                    canvas1 = FigureCanvasQTAgg(self.fig)
-                    self.Qwindow.graphicsView_channel1.setScene(scene1)
-                    scene1.addWidget(canvas1)
-                    self.toolbar_1 = NavigationToolbar(canvas1, self.Qwindow)
-                    # Remove the Home and Customize buttons from the toolbar
-                    unwanted_buttons = ['Customize', 'Home', 'Subplots']
-                    for x in self.toolbar_1.actions():
-                        if x.text() in unwanted_buttons:
-                            self.toolbar_1.removeAction(x)
-                    # Finding The Zoom In button and changing it's icon
-                    actions = self.toolbar_1.actions()
-                    fourth_action = actions[4]
-                    zero_action = actions[0]
-                    first_action = actions[1]
-                    second_action = actions[3]
-                    sixth_action = actions[6]
-                    zoom_in_icon = icon("fa.search-plus",
-                                        color="white")
-                    left_arrow_icon = icon("ei.arrow-left", color="white")
-                    right_arrow_icon = icon("ei.arrow-right", color="white")
-                    pan_icon = icon("fa.hand-paper-o", color="white")
-                    screenshot_icon = icon("ri.screenshot-2-fill", color="white")
-                    fourth_action.setIcon(zoom_in_icon)
-                    zero_action.setIcon(left_arrow_icon)
-                    first_action.setIcon(right_arrow_icon)
-                    second_action.setIcon(pan_icon)
-                    sixth_action.setIcon(screenshot_icon)
-                    zoom_out_icon = icon("fa.search-minus", color="white")
-                    zoom_out_button1 = QtWidgets.QAction(zoom_out_icon, "Zoom Out", self.Qwindow)
-                    zoom_out_button1.triggered.connect(self.Zoom_out_channel1)
-                    self.toolbar_1.insertAction(self.toolbar_1.actions()[4], zoom_out_button1)
-                    for child in self.toolbar_1.findChildren(QtWidgets.QToolButton):
-                        child.setStyleSheet("background-color: #849dad; ")
-                    self.Qwindow.tableWidget.show()
-                    self.Qwindow.pause_button.show()
-                    self.Qwindow.rewind_button1.show()
-                    self.Qwindow.move_button1.show()
-                    self.Qwindow.delete_button1.show()
-                    self.Qwindow.hide_button1.show()
-                    self.Qwindow.speed_up_button1.show()
-                    self.Qwindow.speed_up_button2.show()
-                    self.Qwindow.speed_down_button1.show()
-                    self.Qwindow.speed_down_button2.show()
-                    self.Qwindow.verticalLayout_toolbar1.addWidget(self.toolbar_1)
-
-        # channel2 /graph 2
-        if channel2 == "None" and file_part in self.visited_channel2:
-            del count_files_channel2[file_part]
-            print(self.visited_channel2)
-            self.visited_channel2 = [file2 for idx2, file2 in enumerate(self.visited_channel2) if file2 != file_part]
-            print(len(self.visited_channel2))
-
-            if len(self.visited_channel2) == 0:
-                self.specific_row_2 = 0
-                self.frames_channel2 += 300
-                self.hide_action_ch2 = True
-
-            for item2 in self.hidden_line_ch2.items():
-                if item2[0] == file_part:
-                    self.hidden_idx_2 = item2[1]
-                else:
-                    self.name_files_ch2[item2[1]] = item2[0]
-            print(self.lines2)
-            del self.dic_channel2[self.hidden_idx_2]
-            self.lines2[self.hidden_idx_2] = "None"
-            print(self.lines2)
-            print(self.present_line2.keys())
-            if self.hidden_idx_2 in self.present_line2.keys():
-                del self.present_line2[self.hidden_idx_2]
-            self.fig2.clf()
-            self.Ui_graph_channel2()
-            for idx_line_ch2 in self.dic_channel2.items():
-                self.lines2[idx_line_ch2[0]], = self.ax2.plot([], [], label=self.name_files_ch2[idx_line_ch2[0]],
-                                                              color=self.colors_channel2[idx_line_ch2[0]])
-            self.ax2.legend()
-        if channel2 == "channel2":
-            for item in count_files_channel2.items():
-                if item[0] == file_part:
-                    no_of_repeated = item[1]
-            print(len(self.present_line2))
-            if file_part in self.visited_channel1 and len(self.visited_channel1) == 1:
-                for key, value in self.files_index_ch2.items():
-                    if file_part == value:
-                        self.specific_row = self.specific_row_2 - 1
-                        break
-
-            if no_of_repeated == 1:
-                self.previous_line2 = self.no_of_line_2
-                self.no_of_line_2 += 1
-                self.ax2.set_xlim(0, 2)
-
-                self.ax2.set_ylim(y_range)
-                self.delay_interval = 200
-                if self.no_of_line_2 == 1:
-                    graph_ch2 = True
-                else:
-                    graph_ch2 = False
-                for index_2 in range(self.previous_line2, self.no_of_line_2):
-                    self.hidden_line_ch2[file_part] = index_2
-                    self.lines2[index_2], = self.ax2.plot([], [], label=file_part, color=self.signal_color)
-                    self.colors_channel2[index_2] = self.signal_color
-                    self.files_index_ch2[index_2] = file_part
-                    self.x_fig2[index_2] = []
-                    self.y_fig2[index_2] = []
-                if self.no_of_line_2 > 1 and len(self.visited_channel2) != 1:
-                    self.present_line2[self.no_of_line_2 - 1] = self.current_data_2
-
-                self.dic_channel2[self.no_of_line_2 - 1] = self.read_ecg_data_from_csv(file_namee)
-                if graph_ch2:
-                    self.ani2 = FuncAnimation(self.fig2, self.animate_fig2, interval=self.delay_interval,
-                                              frames=self.frames_channel2, repeat=False)
-                    QCoreApplication.processEvents()
-                self.ax2.legend()
-                if graph_ch2:
-                    scene2 = QtWidgets.QGraphicsScene()
-                    canvas2 = FigureCanvasQTAgg(self.fig2)
-                    self.Qwindow.graphicsView_channel2.setScene(scene2)
-                    scene2.addWidget(canvas2)
-                    self.toolbar_2 = NavigationToolbar(canvas2, self.Qwindow)
-                    # Remove the Home and Customize buttons from the toolbar
-                    unwanted_buttons = ['Customize', 'Home', 'Subplots']
-                    for x in self.toolbar_2.actions():
-                        if x.text() in unwanted_buttons:
-                            self.toolbar_2.removeAction(x)
-                    # Finding The buttons in the toolbar and changing its icons using qtawesome icons
-                    actions = self.toolbar_2.actions()
-                    fourth_action = actions[4]
-                    zero_action = actions[0]
-                    first_action = actions[1]
-                    second_action = actions[3]
-                    sixth_action = actions[6]
-                    zoom_in_icon = icon("fa.search-plus",
-                                        color="white")
-                    left_arrow_icon = icon("ei.arrow-left", color="white")
-                    right_arrow_icon = icon("ei.arrow-right", color="white")
-                    pan_icon = icon("fa.hand-paper-o", color="white")
-                    screenshot_icon = icon("ri.screenshot-2-fill", color="white")
-                    fourth_action.setIcon(zoom_in_icon)
-                    zero_action.setIcon(left_arrow_icon)
-                    first_action.setIcon(right_arrow_icon)
-                    second_action.setIcon(pan_icon)
-                    sixth_action.setIcon(screenshot_icon)
-                    # Creating an Icon for the Zoom Out button and Creating the button Itself
-                    zoom_out_icon = icon("fa.search-minus", color="white")
-                    zoom_out_button2 = QtWidgets.QAction(zoom_out_icon, "Zoom Out", self.Qwindow)
-                    zoom_out_button2.triggered.connect(self.Zoom_out_channel2)
-                    self.toolbar_2.insertAction(self.toolbar_2.actions()[4], zoom_out_button2)
-                    for child in self.toolbar_2.findChildren(QtWidgets.QToolButton):
-                        child.setStyleSheet("background-color: #849dad;")
-                    self.Qwindow.tableWidget.show()
-                    self.Qwindow.pause_button_2.show()
-                    self.Qwindow.rewind_button2.show()
-                    self.Qwindow.move_button2.show()
-                    self.Qwindow.delete_button2.show()
-                    self.Qwindow.hide_button2.show()
-                    self.Qwindow.speed_up_button1.show()
-                    self.Qwindow.speed_up_button2.show()
-                    self.Qwindow.speed_down_button1.show()
-                    self.Qwindow.speed_down_button2.show()
-                    self.Qwindow.verticalLayout_toolbar2.addWidget(self.toolbar_2)
-
-    def current_file_and_channel(self):
-        return str(self.Qwindow.signals_name.currentText())
 
     def show_color_dialog_ch1(self):  # Function to open a color picker dialog for the signal
         color = QColorDialog.getColor()
@@ -1332,25 +1102,34 @@ class File:
         self.Qwindow.color_picker_button.setPalette(palette)
         # Store the selected color as a signal attribute
         self.signal_color = color.name()
-        if len(self.splitted_names_ch1) > 1:
-            self.menu = QMenu()
-            self.menu.triggered.connect(self.actionClicked)
-            for file_name in self.splitted_names_ch1:
-                self.menu.addAction(file_name)
-            action = self.menu.exec_(self.Qwindow.move_button1.mapToGlobal(
-                self.Qwindow.move_button1.rect().bottomLeft()))
-            if action is not None:
-                file = action.text()
+        if not self.add_new_signal:
+            if len(self.splitted_names_ch1) > 1:
+                self.menu = QMenu()
+                self.menu.triggered.connect(self.actionClicked)
+                for file_name in self.splitted_names_ch1:
+                    self.menu.addAction(file_name)
+                action = self.menu.exec_(self.Qwindow.move_button1.mapToGlobal(
+                    self.Qwindow.move_button1.rect().bottomLeft()))
+                if action is not None:
+                    file = action.text()
+                    for item in self.files_index_ch1.items():
+                        if item[1] == file:
+                            self.lines1[item[0]], = self.ax.plot([], [], label=item[1], color=self.signal_color)
+                            self.colors_channel1[item[0]] = self.signal_color
+                            break
+
+            else:
+
                 for item in self.files_index_ch1.items():
-                    if item[1] == file:
-                        self.lines1[item[0]], = self.ax.plot([], [], label=item[1], color=self.signal_color)
+                    if item[1] == self.splitted_names_ch1[0]:
+                        print(item[0], self.signal_color)
+                        self.colors_channel1[item[0]] = self.signal_color
+                        self.lines1[item[0]], = self.ax.plot([], [], label=item[1], color=self.colors_channel1[item[0]])
+
                         break
-        else:
-            for item in self.files_index_ch1.items():
-                if item[1] == self.splitted_names_ch1[0]:
-                    print(item[0], self.signal_color)
-                    self.lines1[item[0]], = self.ax.plot([], [], label=item[1], color=self.signal_color)
-                    break
+
+
+
         return color
 
     def show_color_dialog_ch2(self):  # Function to open a color picker dialog for the signal
@@ -1377,13 +1156,16 @@ class File:
                 for item in self.files_index_ch2.items():
                     if item[1] == file:
                         self.lines2[item[0]], = self.ax2.plot([], [], label=item[1], color=self.signal_color)
+                        self.colors_channel2[item[0]] = self.signal_color
                         break
+
         else:
             for item in self.files_index_ch2.items():
 
                 if item[1] == self.splitted_names_ch2[0]:
                     print(item[0], self.signal_color)
                     self.lines2[item[0]], = self.ax2.plot([], [], label=item[1], color=self.signal_color)
+                    self.colors_channel2[item[0]] = self.signal_color
                     break
         return color
 
@@ -1410,11 +1192,12 @@ class File:
         print(len(self.present_line1))
         # show line
         if no_of_repeated == 1:
+            self.splitted_names_ch1.append(file_part)
             self.previous_line1 = self.no_of_line
             self.no_of_line += 1  # every line take number which is key to access line
             # put limits
             self.ax.set_ylim(y_range)
-            self.ax.set_xlim(0, 2)
+            self.ax.set_xlim(self.Time[3], self.Time[30])
             self.delay_interval = 200
             if self.no_of_line == 1:  # to call func animation once
                 graph_ch1 = True
@@ -1478,21 +1261,26 @@ class File:
                 self.Qwindow.delete_button1.show()
                 self.Qwindow.hide_button1.show()
                 self.Qwindow.speed_up_button1.show()
-                self.Qwindow.speed_up_button2.show()
                 self.Qwindow.speed_down_button1.show()
-                self.Qwindow.speed_down_button2.show()
                 self.Qwindow.verticalLayout_toolbar1.addWidget(self.toolbar_1)
 
     def browse_file(self):
         options = QFileDialog.Options()
+        # file_prev = file_name
         file_name, _ = QFileDialog.getOpenFileName(None, "Open File", "",
                                                    "CSV Files (*.csv)",
                                                    options=options)
+
         if file_name:
             self.files_name.append(file_name)
             file_name = str(file_name)
             file_part = file_name.split('/')[-1].split('.')[0]
-            self.splitted_names_ch1.append(file_part)
+            # self.splitted_names_ch1.append(file_part)
+            # if file_prev != file_name:
+            #     self.add_new_signal = True
+            # else:
+            #     self.add_new_signal = False
+
 
             self.Qwindow.signals_name.addItem(self.line)
             self.Plot_channel1(file_name)
@@ -1508,6 +1296,7 @@ class File:
             self.Qwindow.tableWidget.setItem(self.row_counter - 1, 3, QTableWidgetItem(str(self.duration)))
             self.Qwindow.tableWidget.setItem(self.row_counter - 1, 4, QTableWidgetItem(str(self.min_value)))
             self.Qwindow.tableWidget.setItem(self.row_counter - 1, 5, QTableWidgetItem(str(self.max_value)))
+
 
     def read_ecg_data_from_csv(self, file_name):
         with open(file_name, 'r') as csv_file:
