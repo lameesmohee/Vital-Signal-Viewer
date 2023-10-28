@@ -332,6 +332,7 @@ class File:
             if len(self.visited_channel2) == 0:
                 self.specific_row_2 = 0
                 self.frames_channel2 += 300
+                self.hide_action_ch2 =True
 
             for item2 in self.hidden_line_ch2.items():
                 if item2[0] == file_part:
@@ -384,6 +385,9 @@ class File:
                 self.frames_channel1 += 300
 
     def move_to_channel2(self, file_name):
+        if self.hide_action_ch2:
+            self.specific_row_2 = 0
+            self.hide_action_ch2 = False
         for file in self.files_name:
             file_part = file.split('/')[-1].split('.')[0]
             if file_name == file_part:
@@ -391,7 +395,9 @@ class File:
                 self.signal_values_list = self.read_ecg_data_from_csv(file)
                 break
         self.visited_channel2.append(file_part)
-        self.splitted_names_ch2.append(file_part)
+        if file_part not in self.splitted_names_ch2:
+            self.splitted_names_ch2.append(file_part)
+
 
 
         self.x_min_ch2 = self.Time[self.specific_row_2]
@@ -505,10 +511,7 @@ class File:
             else:
                 self.hide_channel1(self.splitted_names_ch1[0])
 
-
-
-
-        if button_name == self.Qwindow.move_button2:
+        if button_name == self.Qwindow.hide_button2:
             if len(self.splitted_names_ch2) > 1:
                 self.menu = QMenu()
                 file = self.menu.triggered.connect(self.actionClicked)
@@ -544,8 +547,8 @@ class File:
                 self.Qwindow.delete_button2.rect().bottomLeft()))
 
     def move(self, button_name):
-        if len(self.splitted_names_ch1) > 1:
-            if button_name == self.Qwindow.move_button1:
+        if button_name == self.Qwindow.move_button1:
+            if len(self.splitted_names_ch1) > 1:
                 self.menu = QMenu()
                 self.menu.triggered.connect(self.actionClicked)
                 for file_name in self.splitted_names_ch1:
@@ -555,9 +558,8 @@ class File:
                 if action is not None:
                     file = action.text()
                     self.move_to_channel2(file)
-        else:
-            self.move_to_channel2(self.splitted_names_ch1[0])
-
+            else:
+                self.move_to_channel2(self.splitted_names_ch1[0])
         if button_name == self.Qwindow.move_button2:
             if len(self.splitted_names_ch2) > 1:
                 self.menu = QMenu()
@@ -700,6 +702,7 @@ class File:
                     self.Qwindow.pause_button.setText("►")
 
     def Zoom_out_channel1(self):
+
         y_min, y_max = self.ax.get_ylim()
         y_min -= 0.01
         y_max += 0.01
@@ -1173,15 +1176,12 @@ class File:
         if self.hide_action_ch1:
             self.specific_row = 0
             self.hide_action_ch1 = False
-        if self.move_to_ch1 :
-            self.specific_row = self.specific_row_2 - 2
-            self.move_to_ch1 = False
+
 
         self.signal_values_list = self.read_ecg_data_from_csv(file_name)
         file_part = file_name.split('/')[-1].split('.')[0]
         self.visited_channel1.append(file_part)
-        # self.splitted_names_ch1.append(file_part)
-        self.ax.set_xlim(0, 2)
+
         data_y = self.signal_values_list
         y_range = (floor(min(data_y)), ceil(max(data_y)))
         self.count_files_channel1 = Counter(self.visited_channel1)
@@ -1192,6 +1192,9 @@ class File:
         print(len(self.present_line1))
         # show line
         if no_of_repeated == 1:
+            if self.move_to_ch1:
+                self.specific_row = 0
+                self.move_to_ch1 = False
             self.splitted_names_ch1.append(file_part)
             self.previous_line1 = self.no_of_line
             self.no_of_line += 1  # every line take number which is key to access line
