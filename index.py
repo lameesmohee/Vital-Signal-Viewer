@@ -335,6 +335,7 @@ class File:
                 self.lines2[idx_line_ch2[0]], = self.ax2.plot([], [], label=self.name_files_ch2[idx_line_ch2[0]],
                                                               color=self.colors_channel2[idx_line_ch2[0]])
             self.ax2.legend()
+            self.ax2.set_ylim(-1, 1)
 
     def hide_channel1(self, file_name):
         file_part = file_name.split('/')[-1].split('.')[0]
@@ -351,9 +352,7 @@ class File:
                 else:
                     self.name_files_ch1[item[1]] = item[0]
             del self.dic_channel1[self.hidden_idx_1]
-
             self.lines1[self.hidden_idx_1] = "None"
-
             if self.hidden_idx_1 in self.present_line1.keys():
                 del self.present_line1[self.hidden_idx_1]
             self.fig.clf()
@@ -362,6 +361,7 @@ class File:
                 self.lines1[idx_line_ch1[0]], = self.ax.plot([], [], label=self.name_files_ch1[idx_line_ch1[0]],
                                                              color=self.colors_channel1[idx_line_ch1[0]])
             self.ax.legend()
+            self.ax.set_ylim(-1,1)
             if len(self.visited_channel1) == 0:
                 self.hide_action_ch1 = True
                 self.specific_row = 0
@@ -417,7 +417,14 @@ class File:
                 self.ani2 = FuncAnimation(self.fig2, self.animate_fig2, interval=self.delay_interval,
                                           frames=self.frames_channel2, repeat=False)
                 QCoreApplication.processEvents()
-            self.ax2.legend()
+            line_color_show = []
+            for i in self.lines2:
+                if i != None:
+                    line_color_show.append(i)
+                    print(i)
+            print(f"line:{line_color_show}")
+            self.ax2.legend(handles=line_color_show)
+
             if graph_ch2:
                 scene2 = QtWidgets.QGraphicsScene()
                 self.canvas2 = FigureCanvasQTAgg(self.fig2)
@@ -689,6 +696,7 @@ class File:
             self.link = True
         else:
             self.link = False
+            self.specific_row_2 = self.specific_row
 
     def animate_fig2(self, i):  # To animate graph 2
         if self.pause_ch2 or self.rewind_ch2:  # to Pause or Rewind Graph1
@@ -714,12 +722,18 @@ class File:
                         print(f"l:{idx_line2[1]}")
                         current_idx_2 = idx_line2[1]
                         # append data to update graph2
-                        self.y_fig2[idx_line_ch2[0]].append(idx_line_ch2[1][self.specific_row_2 -
-                                                                            (current_idx_2 + 1)])
-                        print(f"line2:{self.x_fig2[idx_line_ch2[0]]}")
+                        if self.link:
+                            self.x_fig2[idx_line_ch2[0]].append(self.Time[self.specific_row])
+                            self.y_fig2[idx_line_ch2[0]].append(idx_line_ch2[1][self.specific_row_2 -
+                                                                                (current_idx_2 + 1)])
+                        else:
+                            self.x_fig2[idx_line_ch2[0]].append(self.Time[self.specific_row_2])
+                            self.y_fig2[idx_line_ch2[0]].append(idx_line_ch2[1][self.specific_row_2 -
+                                                                                (current_idx_2 + 1)])
+
                         self.lines2[idx_line_ch2[0]].set_data(self.x_fig2[idx_line_ch2[0]],
                                                               self.y_fig2[idx_line_ch2[0]])
-                        self.current_data_2 = self.specific_row_2 - current_idx_2
+
             else:
                 # append data to update graph2 to first line
                 if self.link:
@@ -776,10 +790,11 @@ class File:
                         self.x_fig1[idx_line_ch1[0]].append(self.Time[self.specific_row])
                         # append data to update graph1
                         self.y_fig1[idx_line_ch1[0]].append(idx_line_ch1[1][self.specific_row - current_idx])
+
                         print(f"line2:{self.x_fig1[idx_line_ch1[0]]}")
                         self.lines1[idx_line_ch1[0]].set_data(self.x_fig1[idx_line_ch1[0]],
                                                               self.y_fig1[idx_line_ch1[0]])
-                        self.current_data = self.specific_row - current_idx
+                        # self.current_data = self.specific_row - current_idx
             else:
                 # append data to update graph1 to first line
                 self.y_fig1[idx_line_ch1[0]].append(idx_line_ch1[1][self.specific_row])
@@ -817,17 +832,17 @@ class File:
 
         else:
             if button_name == self.Qwindow.speed_up_button1:
-                self.delay_interval = 40
+                self.delay_interval -= 30
                 self.pause_ch1 = True
                 self.pause_ch2 = False
 
             elif button_name == self.Qwindow.speed_up_button2:
-                self.delay_interval = 40
+                self.delay_interval -= 30
                 self.pause_ch2 = True
                 self.pause_ch1 = False
 
             elif self.link:
-                self.delay_interval = 40
+                self.delay_interval -= 30
                 self.pause_ch1 = True
                 self.pause_ch2 = True
 
@@ -840,16 +855,16 @@ class File:
             msg.exec_()
         else:
             if button_name == self.Qwindow.speed_down_button1:
-                self.delay_interval = 200
+                self.delay_interval += 30
                 self.pause_ch1 = True
                 self.pause_ch2 = False
             elif button_name == self.Qwindow.speed_down_button2:
-                self.delay_interval = 200
+                self.delay_interval += 30
                 self.pause_ch2 = True
                 self.pause_ch1 = False
 
             elif self.link:
-                self.delay_interval = 200
+                self.delay_interval += 30
                 self.pause_ch1 = True
                 self.pause_ch2 = True
 
@@ -897,7 +912,6 @@ class File:
             self.pan_ch2 = True
             # do pan
             self.ax2 = event.inaxes  # set the axis to work on
-
             x, y = event.xdata, event.ydata
             print(self.oldxy[0], self.oldxy[1])
             print(f"x,y:{x, y}")
@@ -1044,32 +1058,52 @@ class File:
         self.Qwindow.color_picker_button.setPalette(palette)
         # Store the selected color as a signal attribute
         self.signal_color = color.name()
-        if not self.add_new_signal:
-            if len(self.splitted_names_ch1) > 1:
-                self.menu = QMenu()
-                self.menu.triggered.connect(self.actionClicked)
-                for file_name in self.splitted_names_ch1:
-                    self.menu.addAction(file_name)
-                action = self.menu.exec_(self.Qwindow.move_button1.mapToGlobal(
-                    self.Qwindow.move_button1.rect().bottomLeft()))
-                if action is not None:
-                    file = action.text()
-                    for item in self.files_index_ch1.items():
-                        if item[1] == file:
-                            self.lines1[item[0]], = self.ax.plot([], [], label=item[1], color=self.signal_color)
-                            self.colors_channel1[item[0]] = self.signal_color
-                            break
+        line_color_show = []
 
-            else:
 
+        if len(self.splitted_names_ch1) > 1:
+            self.menu = QMenu()
+            self.menu.triggered.connect(self.actionClicked)
+            for file_name in self.splitted_names_ch1:
+                self.menu.addAction(file_name)
+            action = self.menu.exec_(self.Qwindow.move_button1.mapToGlobal(
+                self.Qwindow.move_button1.rect().bottomLeft()))
+            if action is not None:
+                file = action.text()
                 for item in self.files_index_ch1.items():
-                    if item[1] == self.splitted_names_ch1[0]:
-                        print(item[0], self.signal_color)
+                    if item[1] == file:
                         self.colors_channel1[item[0]] = self.signal_color
                         self.lines1[item[0]], = self.ax.plot([], [], label=item[1], color=self.colors_channel1[item[0]])
 
                         break
+
+                for i in self.lines1:
+                    if i != None:
+                        line_color_show.append(i)
+                        print(i)
+                print(f"line:{line_color_show}")
+                self.ax.legend(handles=line_color_show)
+
+                self.fig.canvas.draw()
+
+        else:
+
+            for item in self.files_index_ch1.items():
+                if item[1] == self.splitted_names_ch1[0]:
+                    print(item[0], self.signal_color)
+                    self.colors_channel1[item[0]] = self.signal_color
+                    self.lines1[item[0]], = self.ax.plot([], [], label=item[1], color=self.colors_channel1[item[0]])
+
+                    break
+            for i in self.lines1:
+                if i != None:
+                    line_color_show.append(i)
+                    print(i)
+            print(f"line:{line_color_show}")
+            self.ax.legend(handles=line_color_show)
+            self.fig.canvas.draw()
         return color
+
 
     def show_color_dialog_ch2(self):  # Function to open a color picker dialog for the signal
         color = QColorDialog.getColor()
@@ -1095,6 +1129,7 @@ class File:
                         self.lines2[item[0]], = self.ax2.plot([], [], label=item[1], color=self.signal_color)
                         self.colors_channel2[item[0]] = self.signal_color
                         break
+
         else:
             for item in self.files_index_ch2.items():
                 if item[1] == self.splitted_names_ch2[0]:
@@ -1102,6 +1137,13 @@ class File:
                     self.lines2[item[0]], = self.ax2.plot([], [], label=item[1], color=self.signal_color)
                     self.colors_channel2[item[0]] = self.signal_color
                     break
+        line_color_show=[]
+        for i in self.lines2:
+            if i != None:
+                line_color_show.append(i)
+                print(i)
+        print(f"line:{line_color_show}")
+        self.ax2.legend(handles=line_color_show)
         return color
 
     def Plot_channel1(self, file_name):
@@ -1138,8 +1180,11 @@ class File:
             for index in range(self.previous_line1, self.no_of_line):  # store lines of graph1
                 self.hidden_line_ch1[file_part] = index
                 self.files_index_ch1[index] = file_part
-                self.lines1[index], = self.ax.plot([], [], label=file_part, color=self.signal_color)
                 self.colors_channel1[index] = self.signal_color
+                self.lines1[index], = self.ax.plot([], [], label=file_part, color=self.colors_channel1[index])
+
+
+
                 self.x_fig1[index] = []
                 self.y_fig1[index] = []
             # to add another /signals and begin  from last time of first line
@@ -1150,7 +1195,14 @@ class File:
             if graph_ch1:  # create animation
                 self.ani = FuncAnimation(self.fig, self.animate_fig1, interval=200,
                                          frames=self.frames_channel1, repeat=False)
-            self.ax.legend()  # set label to lines
+
+            line_color_show = []
+            for i in self.lines1:
+                if i != None:
+                    line_color_show.append(i)
+                    print(i)
+            print(f"line:{line_color_show}")
+            self.ax.legend(handles=line_color_show)  # set label to lines
             if graph_ch1:  # show graph on graphics view
                 scene1 = QtWidgets.QGraphicsScene()
                 self.canvas1 = FigureCanvasQTAgg(self.fig)
