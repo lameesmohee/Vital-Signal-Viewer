@@ -757,23 +757,17 @@ QPushButton:pressed {
    <widget class="QPushButton" name="color_picker_button">
     <property name="geometry">
      <rect>
-      <x>310</x>
+      <x>1350</x>
       <y>470</y>
       <width>31</width>
       <height>31</height>
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">
-
-QPushButton {
-    background-color: red; /* Background color*/
+     <string notr="true">background-color: red; /* Background color*/
     border: 2px solid #849dad; /* Border style*/
-    border-radius: 15px; /* Rounded corners */
-    color: #ffffff; /* Text color */
-    padding: 5px 15px; /* Padding around the text */
-    font-size: 14px; /* Text font size */
-}</string>
+
+</string>
     </property>
     <property name="text">
      <string/>
@@ -923,9 +917,9 @@ border: 2px solid #849dad; </string>
    <widget class="QWidget" name="verticalLayoutWidget_4">
     <property name="geometry">
      <rect>
-      <x>350</x>
+      <x>260</x>
       <y>470</y>
-      <width>471</width>
+      <width>491</width>
       <height>41</height>
      </rect>
     </property>
@@ -934,9 +928,9 @@ border: 2px solid #849dad; </string>
    <widget class="QWidget" name="verticalLayoutWidget_5">
     <property name="geometry">
      <rect>
-      <x>350</x>
+      <x>260</x>
       <y>910</y>
-      <width>471</width>
+      <width>461</width>
       <height>41</height>
      </rect>
     </property>
@@ -997,64 +991,6 @@ QTableWidget QHeaderView::section { text-align: center; }
      </property>
     </column>
    </widget>
-   <widget class="QPushButton" name="pause_button">
-    <property name="geometry">
-     <rect>
-      <x>60</x>
-      <y>470</y>
-      <width>41</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>❚❚</string>
-    </property>
-    <property name="shortcut">
-     <string>Ctrl+P</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pause_button_2">
-    <property name="geometry">
-     <rect>
-      <x>60</x>
-      <y>910</y>
-      <width>41</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>❚❚</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="rewind_button1">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>470</y>
-      <width>41</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="shortcut">
-     <string>Ctrl+R</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="rewind_button2">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>910</y>
-      <width>41</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
    <widget class="QRadioButton" name="link_button">
     <property name="geometry">
      <rect>
@@ -1103,122 +1039,18 @@ color:#849dad;</string>
      <string>SPEED</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="hide_button1">
-    <property name="geometry">
-     <rect>
-      <x>100</x>
-      <y>470</y>
-      <width>41</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="shortcut">
-     <string>Ctrl+R</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="hide_button2">
-    <property name="geometry">
-     <rect>
-      <x>100</x>
-      <y>910</y>
-      <width>41</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="shortcut">
-     <string>Ctrl+R</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="delete_button1">
-    <property name="geometry">
-     <rect>
-      <x>180</x>
-      <y>470</y>
-      <width>41</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="shortcut">
-     <string>Ctrl+R</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="delete_button2">
-    <property name="geometry">
-     <rect>
-      <x>180</x>
-      <y>910</y>
-      <width>41</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="shortcut">
-     <string>Ctrl+R</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="move_button2">
-    <property name="geometry">
-     <rect>
-      <x>140</x>
-      <y>910</y>
-      <width>41</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="shortcut">
-     <string>Ctrl+R</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="move_button1">
-    <property name="geometry">
-     <rect>
-      <x>140</x>
-      <y>470</y>
-      <width>41</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="shortcut">
-     <string>Ctrl+R</string>
-    </property>
-   </widget>
    <widget class="QPushButton" name="color_picker_button_2">
     <property name="geometry">
      <rect>
-      <x>310</x>
+      <x>1350</x>
       <y>910</y>
       <width>31</width>
       <height>31</height>
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">
-
-QPushButton {
-    background-color: red; /* Background color*/
-    border: 2px solid #849dad; /* Border style*/
-    border-radius: 15px; /* Rounded corners */
-    color: #ffffff; /* Text color */
-    padding: 5px 15px; /* Padding around the text */
-    font-size: 14px; /* Text font size */
-}</string>
+     <string notr="true">background-color: red; /* Background color*/
+    border: 2px solid #849dad; /* Border style*/</string>
     </property>
     <property name="text">
      <string/>
@@ -1230,79 +1062,233 @@ QPushButton {
      </size>
     </property>
    </widget>
-   <widget class="QPushButton" name="speed_up_button2">
+   <widget class="QFrame" name="frame">
     <property name="geometry">
      <rect>
-      <x>220</x>
+      <x>20</x>
       <y>910</y>
-      <width>41</width>
+      <width>241</width>
       <height>41</height>
      </rect>
     </property>
-    <property name="text">
-     <string/>
+    <property name="frameShape">
+     <enum>QFrame::StyledPanel</enum>
     </property>
-    <property name="shortcut">
-     <string>Ctrl+R</string>
+    <property name="frameShadow">
+     <enum>QFrame::Raised</enum>
     </property>
+    <widget class="QPushButton" name="rewind_button2">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>41</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pause_button_2">
+     <property name="geometry">
+      <rect>
+       <x>40</x>
+       <y>0</y>
+       <width>41</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>❚❚</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="hide_button2">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>0</y>
+       <width>41</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="shortcut">
+      <string>Ctrl+R</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="move_button2">
+     <property name="geometry">
+      <rect>
+       <x>120</x>
+       <y>0</y>
+       <width>41</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="shortcut">
+      <string>Ctrl+R</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="speed_up_button2">
+     <property name="geometry">
+      <rect>
+       <x>160</x>
+       <y>0</y>
+       <width>41</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="shortcut">
+      <string>Ctrl+R</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="speed_down_button2">
+     <property name="geometry">
+      <rect>
+       <x>200</x>
+       <y>0</y>
+       <width>41</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="shortcut">
+      <string>Ctrl+R</string>
+     </property>
+    </widget>
    </widget>
-   <widget class="QPushButton" name="speed_down_button2">
+   <widget class="QFrame" name="frame_2">
     <property name="geometry">
      <rect>
-      <x>260</x>
-      <y>910</y>
-      <width>41</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="shortcut">
-     <string>Ctrl+R</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="speed_up_button1">
-    <property name="geometry">
-     <rect>
-      <x>220</x>
+      <x>20</x>
       <y>470</y>
-      <width>41</width>
-      <height>41</height>
+      <width>241</width>
+      <height>39</height>
      </rect>
     </property>
-    <property name="font">
-     <font>
-      <bold>true</bold>
-     </font>
+    <property name="frameShape">
+     <enum>QFrame::StyledPanel</enum>
     </property>
-    <property name="text">
-     <string/>
+    <property name="frameShadow">
+     <enum>QFrame::Raised</enum>
     </property>
-    <property name="shortcut">
-     <string>Ctrl+R</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="speed_down_button1">
-    <property name="geometry">
-     <rect>
-      <x>260</x>
-      <y>470</y>
-      <width>41</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <bold>true</bold>
-     </font>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="shortcut">
-     <string>Ctrl+R</string>
-    </property>
+    <widget class="QPushButton" name="rewind_button1">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>41</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="shortcut">
+      <string>Ctrl+R</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pause_button">
+     <property name="geometry">
+      <rect>
+       <x>40</x>
+       <y>0</y>
+       <width>41</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>❚❚</string>
+     </property>
+     <property name="shortcut">
+      <string>Ctrl+P</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="hide_button1">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>0</y>
+       <width>41</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="shortcut">
+      <string>Ctrl+R</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="move_button1">
+     <property name="geometry">
+      <rect>
+       <x>120</x>
+       <y>0</y>
+       <width>41</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="shortcut">
+      <string>Ctrl+R</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="speed_up_button1">
+     <property name="geometry">
+      <rect>
+       <x>160</x>
+       <y>0</y>
+       <width>41</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="shortcut">
+      <string>Ctrl+R</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="speed_down_button1">
+     <property name="geometry">
+      <rect>
+       <x>200</x>
+       <y>0</y>
+       <width>41</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="shortcut">
+      <string>Ctrl+R</string>
+     </property>
+    </widget>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -1311,7 +1297,7 @@ QPushButton {
      <x>0</x>
      <y>0</y>
      <width>1406</width>
-     <height>26</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
